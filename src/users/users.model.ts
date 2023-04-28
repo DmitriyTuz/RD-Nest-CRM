@@ -7,6 +7,7 @@ import {
 
 
 interface UserCreationAttrs {
+    name: string
     email: string;
     password: string;
 }
@@ -21,6 +22,13 @@ export class User extends Model<User, UserCreationAttrs> {
         primaryKey: true,
     })
     id: number;
+
+    @Column({
+        type: DataType.STRING,
+        unique: true,
+        allowNull: false
+    })
+    name: string;
 
     @Column({
         type: DataType.STRING,
