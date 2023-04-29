@@ -3,6 +3,8 @@ import {InjectModel} from "@nestjs/sequelize";
 import {User} from "./users.model";
 import {CreateUserDto} from "./dto/create-user.dto";
 
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+
 @Injectable()
 export class UsersService {
     constructor(
@@ -24,6 +26,11 @@ export class UsersService {
             where: { email },
             include: { all: true },
         });
+        return user;
+    }
+
+    async getUserProfile(userId) {
+        const user = await this.userRepository.findOne({where: { id: userId }});
         return user;
     }
 }
