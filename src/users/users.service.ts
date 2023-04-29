@@ -4,11 +4,14 @@ import {User} from "./users.model";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {AddTagDto} from "./dto/add-tag.dto";
 import {TagsService} from "../tags/tags.service";
+import {UserTags} from "../tags/user-tags.model";
+import {Tag} from "../tags/tags.model";
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectModel(User) private userRepository: typeof User,
+        @InjectModel(UserTags) private user_tagRepository: typeof UserTags,
         private tagService: TagsService
     ) {}
 
@@ -36,13 +39,53 @@ export class UsersService {
     }
 
     async addTag(dto: AddTagDto, req) {
-        const user = await this.userRepository.findByPk(req.user.id);
-        const tag = await this.tagService.getTagByNameAndColor(dto.name, dto.color);
-        if (tag && user) {
-            await user.$add("tag", tag.id);
-            return dto;
+
+        try {
+            const user = await this.userRepository.findByPk(req.user.id);
+            const tag = await this.tagService.getTagByNameAndColor(dto.name, dto.color);
+            const alreadyExists = await this.user_tagRepository.findOne({where: {userId: user.id, tagId: tag.id}})
+
+            if (alreadyExists) {
+                throw new HttpException("Already exists", HttpStatus.BAD_REQUEST)
+            }
+
+            if (tag && user) {
+                await user.$add("tag", tag.id);
+                return dto;
+            }
+            throw new HttpException("User or tag not found", HttpStatus.NOT_FOUND);
+        } catch (e) {
+            console.log('!!! ERROR = ', e.message, 'ALL !!!')
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
-        throw new HttpException("User or tag not found", HttpStatus.NOT_FOUND);
     }
+
+    async getUsersByTags(tagId) {
+    //     // const users = await this.userRepository.findAll({
+    //     //     where: {},
+    //     //     include: [{
+    //     //         model: Tag,
+    //     //         as: 'tags',
+    //     //         attributes: ['id']
+    //     //     }]
+    //     // })
+    //     // console.log('!!! users = ', users[0].id)
+    //     // console.log('!!! users.length = ', users.length)
+    //     // return users;
+    }
+
+    async findByTagIds(tagIds: number[]): Promise<User[]> {
+        return this.userRepository.findAll({
+            include: [
+                {
+                    model: Tag,
+                    where: {
+                        id: tagIds
+                    }
+                }
+            ]
+        });
+    }
+
 }
 

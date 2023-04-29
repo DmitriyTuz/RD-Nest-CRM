@@ -7,7 +7,7 @@ import {
     Request,
     Response,
     createParamDecorator,
-    ExecutionContext
+    ExecutionContext, Query
 } from "@nestjs/common";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
@@ -54,6 +54,17 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     addTag(@Body() dto: AddTagDto, @Request() req) {
         return this.usersService.addTag(dto, req);
+    }
+
+    @Get('/getUsersByTags')
+    getUsersByTags(tagId: number) {
+        return this.usersService.getUsersByTags(tagId)
+    }
+
+    @Get('search-by-tags')
+    async searchByTags(@Query('tagIds') tagIds: string): Promise<User[]> {
+        const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
+        return this.usersService.findByTagIds(tagIdArr);
     }
 
 }
