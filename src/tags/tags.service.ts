@@ -24,4 +24,10 @@ export class TagsService {
         const user = await this.tagRepository.findOne({where: { id }});
         return user;
     }
+
+    async getTagByNameAndColor(name: string, color: string) {
+        const user = await this.tagRepository.findOne({where: { name, color }});
+        return user;
+    }
+
 }

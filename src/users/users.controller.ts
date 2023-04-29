@@ -14,8 +14,7 @@ import {UsersService} from "./users.service";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-
-import { AuthGuard } from '@nestjs/passport';
+import {AddTagDto} from "./dto/add-tag.dto";
 
 const UserP = createParamDecorator(
     (data: unknown, ctx: ExecutionContext) => {
@@ -31,7 +30,7 @@ export class UsersController {
 
     @ApiOperation({ summary: "User creation" })
     @ApiResponse({ status: 200, type: User })
-    @Post()
+    @Post('/create-user')
     create(@Body() userDto: CreateUserDto) {
         return this.usersService.createUser(userDto);
     }
@@ -51,10 +50,11 @@ export class UsersController {
 
     }
 
-    // @Post("/tag")
-    // addTag(@Body() dto: AddTagDto) {
-    //     return this.usersService.addTag(dto);
-    // }
+    @Post('/add-tag')
+    @UseGuards(JwtAuthGuard)
+    addTag(@Body() dto: AddTagDto, @Request() req) {
+        return this.usersService.addTag(dto, req);
+    }
 
 }
 
