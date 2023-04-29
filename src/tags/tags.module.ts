@@ -13,6 +13,7 @@ import {AuthModule} from "../auth/auth.module";
   imports: [
     SequelizeModule.forFeature([Tag, User, UserTags]),
     forwardRef(() => AuthModule)
-  ]
+  ],
+  exports: [TagsService]
 })
 export class TagsModule {}
