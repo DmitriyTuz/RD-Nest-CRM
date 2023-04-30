@@ -5,9 +5,7 @@ import {
     Post,
     UseGuards,
     Request,
-    Response,
-    createParamDecorator,
-    ExecutionContext, Query
+    Query, Param
 } from "@nestjs/common";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
@@ -16,17 +14,34 @@ import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {AddTagDto} from "./dto/add-tag.dto";
 
-const UserP = createParamDecorator(
-    (data: unknown, ctx: ExecutionContext) => {
-        const request = ctx.switchToHttp().getRequest();
-        return request.user;
-    },
-);
-
 @ApiTags("Users")
 @Controller('users')
 export class UsersController {
     constructor(private usersService: UsersService) {}
+
+    @ApiOperation({ summary: "Getting all users" })
+    @ApiResponse({ status: 200, type: [User] })
+    @UseGuards(JwtAuthGuard)
+    @Get('/get-all-users')
+    getAll() {
+        return this.usersService.getAllUsers();
+    }
+
+    @ApiOperation({ summary: "Getting user by id" })
+    @ApiResponse({ status: 200, type: User })
+    @Get('/:id')
+    @UseGuards(JwtAuthGuard)
+    getUserById(@Param('id') id: number) {
+        return this.usersService.getUserById(id);
+    }
+
+    @ApiOperation({ summary: "Getting current user (only after login !)" })
+    @ApiResponse({ status: 200, type: User })
+    @Get('/get-current-user')
+    @UseGuards(JwtAuthGuard)
+    getUserProfile(@Request() req) {
+        return this.usersService.getUserProfile(req.user.id);
+    }
 
     @ApiOperation({ summary: "User creation" })
     @ApiResponse({ status: 200, type: User })
@@ -35,36 +50,17 @@ export class UsersController {
         return this.usersService.createUser(userDto);
     }
 
-    @ApiOperation({ summary: "Getting all users" })
-    @ApiResponse({ status: 200, type: [User] })
-    @UseGuards(JwtAuthGuard)
-    @Get()
-    getAll() {
-        return this.usersService.getAllUsers();
-    }
-
-    @Get('/profile')
-    @UseGuards(JwtAuthGuard)
-    getUserProfile(@Request() req) {
-        return this.usersService.getUserProfile(req.user.id);
-
-    }
-
     @Post('/add-tag')
     @UseGuards(JwtAuthGuard)
     addTag(@Body() dto: AddTagDto, @Request() req) {
         return this.usersService.addTag(dto, req);
     }
 
-    @Get('/getUsersByTags')
-    getUsersByTags(tagId: number) {
-        return this.usersService.getUsersByTags(tagId)
-    }
-
-    @Get('search-by-tags')
-    async searchByTags(@Query('tagIds') tagIds: string): Promise<User[]> {
+    @Get('find-by-tags')
+    @UseGuards(JwtAuthGuard)
+    async findByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
         const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
-        return this.usersService.findByTagIds(tagIdArr);
+        return this.usersService.findByTagIds(tagIdArr, req.user.id);
     }
 
 }

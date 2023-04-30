@@ -52,6 +52,7 @@ export class AuthService {
       user.password
     );
     if (user && passwordEquals) {
+
       return user;
     }
     throw new UnauthorizedException({
