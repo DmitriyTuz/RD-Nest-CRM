@@ -8,7 +8,6 @@ import {Tag} from "./tags/tags.model";
 import {UserTags} from "./tags/user-tags.model";
 import {AuthModule} from "./auth/auth.module";
 
-
 @Module({
     controllers: [],
     providers: [],

@@ -21,23 +21,34 @@ export class UsersController {
 
     @ApiOperation({ summary: "Getting all users" })
     @ApiResponse({ status: 200, type: [User] })
-    @UseGuards(JwtAuthGuard)
-    @Get('/get-all-users')
-    getAll() {
-        return this.usersService.getAllUsers();
+    // @UseGuards(JwtAuthGuard)
+    @Get('get-all-users')
+    findAll() {
+        return this.usersService.findAll();
     }
+
+    // @Get('find-by-tags')
+    // @UseGuards(JwtAuthGuard)
+    // async getUsersByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
+    //     try {
+    //         const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
+    //         return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
+    //     } catch (e) {
+    //         console.log('!!! err = ', e)
+    //     }
+    // }
 
     @ApiOperation({ summary: "Getting user by id" })
     @ApiResponse({ status: 200, type: User })
-    @Get('/:id')
-    @UseGuards(JwtAuthGuard)
+    @Get(':id')
+    // @UseGuards(JwtAuthGuard)
     getUserById(@Param('id') id: number) {
         return this.usersService.getUserById(id);
     }
 
     @ApiOperation({ summary: "Getting current user (only after login !)" })
     @ApiResponse({ status: 200, type: User })
-    @Get('/get-current-user')
+    @Get('get-current-user')
     @UseGuards(JwtAuthGuard)
     getUserProfile(@Request() req) {
         return this.usersService.getUserProfile(req.user.id);
@@ -45,23 +56,16 @@ export class UsersController {
 
     @ApiOperation({ summary: "User creation" })
     @ApiResponse({ status: 200, type: User })
-    @Post('/create-user')
+    @Post('create-user')
     create(@Body() userDto: CreateUserDto) {
         return this.usersService.createUser(userDto);
     }
 
-    @Post('/add-tag')
-    @UseGuards(JwtAuthGuard)
-    addTag(@Body() dto: AddTagDto, @Request() req) {
-        return this.usersService.addTag(dto, req);
-    }
-
-    @Get('find-by-tags')
-    @UseGuards(JwtAuthGuard)
-    async findByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
-        const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
-        return this.usersService.findByTagIds(tagIdArr, req.user.id);
-    }
+    // @Post('add-tag')
+    // @UseGuards(JwtAuthGuard)
+    // addTag(@Body() dto: AddTagDto, @Request() req) {
+    //     return this.usersService.addTag(dto, req);
+    // }
 
 }
 

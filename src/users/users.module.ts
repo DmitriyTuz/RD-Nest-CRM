@@ -7,10 +7,11 @@ import {Tag} from "../tags/tags.model";
 import {UserTags} from "../tags/user-tags.model";
 import {AuthModule} from "../auth/auth.module";
 import {TagsModule} from "../tags/tags.module";
+import {UserRepository} from "./users.repository";
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, UserRepository],
   imports: [
       SequelizeModule.forFeature([User, Tag, UserTags]),
       TagsModule,

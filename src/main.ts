@@ -7,10 +7,10 @@ async function start() {
     const app = await NestFactory.create(AppModule);
 
     const config = new DocumentBuilder()
-        .setTitle("ul_nest")
+        .setTitle("test-RaDevs")
         .setDescription("Documentation REST API")
         .setVersion("0.0.1")
-        .addTag("D TUZ")
+        .addTag("D_TUZ")
         .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup("/api/docs", app, document);
