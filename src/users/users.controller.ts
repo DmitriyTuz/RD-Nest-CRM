@@ -5,7 +5,7 @@ import {
     Post,
     UseGuards,
     Request,
-    Query, Param
+    Query, Param, HttpStatus, HttpException, Put
 } from "@nestjs/common";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
@@ -23,8 +23,13 @@ export class UsersController {
     @ApiResponse({ status: 200, type: [User] })
     // @UseGuards(JwtAuthGuard)
     @Get('get-all-users')
-    findAll() {
-        return this.usersService.findAll();
+    GetAllUsers() {
+        try {
+            return this.usersService.GetAllUsers();
+        } catch (e) {
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     // @Get('find-by-tags')
@@ -48,11 +53,7 @@ export class UsersController {
 
     @ApiOperation({ summary: "Getting current user (only after login !)" })
     @ApiResponse({ status: 200, type: User })
-    @Get('get-current-user')
-    @UseGuards(JwtAuthGuard)
-    getUserProfile(@Request() req) {
-        return this.usersService.getUserProfile(req.user.id);
-    }
+
 
     @ApiOperation({ summary: "User creation" })
     @ApiResponse({ status: 200, type: User })
@@ -61,11 +62,11 @@ export class UsersController {
         return this.usersService.createUser(userDto);
     }
 
-    // @Post('add-tag')
-    // @UseGuards(JwtAuthGuard)
-    // addTag(@Body() dto: AddTagDto, @Request() req) {
-    //     return this.usersService.addTag(dto, req);
-    // }
+    @Put('add-tag')
+    @UseGuards(JwtAuthGuard)
+    addTagToUser(@Body() dto: AddTagDto, @Request() req) {
+        return this.usersService.addTagToUser(dto, req);
+    }
 
 }
 

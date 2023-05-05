@@ -144,18 +144,24 @@ import {ConfigModule} from "@nestjs/config";
 import {JwtModule} from "@nestjs/jwt";
 
 import * as request from 'supertest';
-import {HttpStatus} from "@nestjs/common";
+import {HttpStatus, INestApplication} from "@nestjs/common";
+import {TestHelper} from "../../test/common/test-helper";
+import {TagsModule} from "../tags/tags.module";
+import {TagRepository} from "../tags/tags.repository";
+import {TagsService} from "../tags/tags.service";
 
 
 describe('UserController', () => {
   let controller: UsersController;
   let service: UsersService;
   let userRepository: UserRepository;
+  let app: INestApplication;
+  // let testHelper: TestHelper;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [UsersService, UserRepository],
+      providers: [UsersService, UserRepository, TagsService, TagRepository],
       imports: [
         ConfigModule.forRoot({
           envFilePath: `.${process.env.NODE_ENV}.env`
@@ -171,7 +177,7 @@ describe('UserController', () => {
           autoLoadModels: true
         }),
         SequelizeModule.forFeature([User, Tag, UserTags]),
-        JwtModule
+        JwtModule,
         // TagsModule,
         // forwardRef(() => AuthModule)
       ]
@@ -180,29 +186,57 @@ describe('UserController', () => {
     controller = module.get<UsersController>(UsersController);
     service = module.get<UsersService>(UsersService);
     userRepository = module.get<UserRepository>(UserRepository);
+
+    app = module.createNestApplication();
+    await app.init();
+
+    // testHelper = new TestHelper(app);
   });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  // });
 
   it('should be defined', async () => {
 
-    // const response = await request(app.getHttpServer()).get('/users/get-all-users');
+    const response = await request(app.getHttpServer()).get('/users/get-all-users');
 
     expect(controller).toBeDefined();
-    // expect(response.status).toBe(HttpStatus.OK);
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body).toBeDefined()
+    expect(Array.isArray(response.body)).toBe(true)
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
 
   });
 
-  describe('findAll', () => {
-    it('should return an array of users', async () => {
-      const result: User[] = [
-        await userRepository.createUser({name: "Sasha", email: "s@gmail.com", password: "123"}),
-        await userRepository.createUser({name: "Gena", email: "g@gmail.com", password: "123"})
-      ]
+  // describe('findAll', () => {
+  it('should return an array of users', async () => {
+    const result: User[] = [
+      await userRepository.createUser({name: "Sasha", email: "s@gmail.com", password: "123"}),
+      await userRepository.createUser({name: "Gena", email: "g@gmail.com", password: "123"})
+    ]
       await userRepository.deleteUserByEmail("s@gmail.com")
       await userRepository.deleteUserByEmail("g@gmail.com")
 
-      jest.spyOn(controller, 'findAll').mockResolvedValue(result);
+      jest.spyOn(controller, 'GetAllUsers').mockResolvedValue(result);
+      // jest.spyOn(testHelper, 'findAll').mockResolvedValue(result);
 
-      expect(await controller.findAll()).toBe(result);
+      expect(await controller.GetAllUsers()).toBe(result);
     });
-  });
+
+  it('should NOT GET all the users', async() => {
+    const response = await request(app.getHttpServer()).get('/users/get-all-user');
+    expect(response.statusCode).toBe(HttpStatus.INTERNAL_SERVER_ERROR)
+  })
+
+  // it('addTagToUser', async() => {
+  //
+  //   let Payload;
+  //   const response = await request(app.getHttpServer()).put('/users/add-tag').send(Payload);
+  // })
 });
+
+
+// });

@@ -20,6 +20,11 @@ export class UserRepository {
         return user;
     }
 
+    async findByPk(id) {
+        const user = await this.userModel.findByPk(id);
+        return user;
+    }
+
     async createUser(dto: CreateUserDto) {
         const user = await this.userModel.create(dto);
         return user;

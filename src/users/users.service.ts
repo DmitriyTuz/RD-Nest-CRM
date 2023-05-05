@@ -13,12 +13,13 @@ export class UsersService {
     // constructor(
     //     @InjectModel(User) private userRepository: typeof User,
     //     // @InjectModel(UserTags) private user_tagRepository: typeof UserTags,
-    //     private tagService: TagsService
     // ) {}
 
-    constructor(private readonly userRepository: UserRepository) {}
+    constructor(private readonly userRepository: UserRepository,
+                private tagService: TagsService
+    ) {}
 
-    async findAll() {
+    async GetAllUsers() {
         const users = await this.userRepository.findAll();
         return users;
     }
@@ -48,26 +49,26 @@ export class UsersService {
         return user;
     }
 
-    // async addTag(dto: AddTagDto, req) {
-    //
-    //     try {
-    //         const user = await this.userRepository.findByPk(req.user.id);
-    //         const tag = await this.tagService.getTagByNameAndColor(dto.name, dto.color);
-    //         // const alreadyExists = await this.user_tagRepository.findOne({where: {userId: user.id, tagId: tag.id}})
-    //         //
-    //         // if (alreadyExists) {
-    //         //     throw new HttpException("Already exists", HttpStatus.BAD_REQUEST)
-    //         // }
-    //
-    //         if (tag && user) {
-    //             await user.$add("tag", tag.id);
-    //             return dto;
-    //         }
-    //         throw new HttpException("User or tag not found", HttpStatus.NOT_FOUND);
-    //     } catch (e) {
-    //         throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
-    //     }
-    // }
+    async addTagToUser(dto: AddTagDto, req) {
+
+        try {
+            const user = await this.userRepository.findByPk(req.user.id);
+            const tag = await this.tagService.getTagByNameAndColor(dto.name, dto.color);
+            // const alreadyExists = await this.user_tagRepository.findOne({where: {userId: user.id, tagId: tag.id}})
+            //
+            // if (alreadyExists) {
+            //     throw new HttpException("Already exists", HttpStatus.BAD_REQUEST)
+            // }
+
+            if (tag && user) {
+                await user.$add("tag", tag.id);
+                return dto;
+            }
+            throw new HttpException("User or tag not found", HttpStatus.NOT_FOUND);
+        } catch (e) {
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     // async getUsersByTagIds(tagIds: number[], userId): Promise<User[]> {
     //     return this.userRepository.findAll({
@@ -86,4 +87,5 @@ export class UsersService {
     // }
 
 }
+
 

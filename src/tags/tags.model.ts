@@ -12,7 +12,7 @@ import {UserTags} from "./user-tags.model";
 interface TagCreationAttrs {
     name: string
     color: string;
-    tagCreatorId: number;
+    ownerId: number;
 }
 
 @Table({ tableName: "tags" })
@@ -30,7 +30,6 @@ export class Tag extends Model<Tag, TagCreationAttrs> {
     @ApiProperty({ example: "Education", description: "interests" })
     @Column({
         type: DataType.STRING,
-        unique: true,
         allowNull: false
     })
     name: string;
@@ -47,7 +46,7 @@ export class Tag extends Model<Tag, TagCreationAttrs> {
         type: DataType.INTEGER,
         allowNull: false
     })
-    tagCreatorId: number;
+    ownerId: number;
 
     @BelongsToMany(() => User, () => UserTags)
     users: User[];
