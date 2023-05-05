@@ -2,32 +2,40 @@ import {Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/sequelize";
 import {Tag} from "./tags.model";
 import {CreateTagDto} from "./dto/create-tag.dto";
+import {UserRepository} from "../users/users.repository";
+import {TagRepository} from "./tags.repository";
 
 @Injectable()
 export class TagsService {
 
-    constructor(
-        @InjectModel(Tag) private tagRepository: typeof Tag
-    ) {}
+    // constructor(
+    //     @InjectModel(Tag) private tagRepository: typeof Tag
+    // ) {}
 
-    async createTag(dto: CreateTagDto, userId) {
-        const tag = await this.tagRepository.create({...dto, tagCreatorId: userId});
-        return tag;
-    }
+    constructor(private readonly tagRepository: TagRepository) {}
+
+    // async createTag(dto: CreateTagDto, userId) {
+    //     const tag = await this.tagRepository.create({...dto, ownerId: userId});
+    //     return tag;
+    // }
 
     async getAllTags() {
-        const tags = await this.tagRepository.findAll({ include: { all: true } });
+        const tags = await this.tagRepository.findAll();
         return tags;
     }
 
-    async getTagById(id: number) {
-        const user = await this.tagRepository.findOne({where: { id }});
+    // async getTagById(id: number) {
+    //     const user = await this.tagRepository.findOne({where: { id }});
+    //     return user;
+    // }
+    //
+    async getTagByNameAndColor(name: string, color: string) {
+        const user = await this.tagRepository.getTagByNameAndColor(name, color);
         return user;
     }
 
-    async getTagByNameAndColor(name: string, color: string) {
-        const user = await this.tagRepository.findOne({where: { name, color }});
-        return user;
-    }
+    // async findOrCreateTags(tags: Array<any>, currentUserId: number) {
+    //     return findOrCreateTags(tags, currentUserId)
+    // }
 
 }

@@ -38,6 +38,10 @@ export class AuthService {
     return this.generateToken(user);
   }
 
+  async getCurrentUser(req) {
+    return await this.userService.getUserById(req.user.id)
+  }
+
   private async generateToken(user: User) {
     const payload = { name: user.name, email: user.email, id: user.id };
     return {

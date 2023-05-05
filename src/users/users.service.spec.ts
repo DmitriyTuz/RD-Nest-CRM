@@ -30,6 +30,8 @@ import {AuthModule} from "../auth/auth.module";
 import {UserRepository} from "./users.repository";
 import {ConfigModule} from "@nestjs/config";
 import {JwtModule} from "@nestjs/jwt";
+import {TagRepository} from "../tags/tags.repository";
+import {TagsService} from "../tags/tags.service";
 
 describe('UsersService', () => {
     let service: UsersService;
@@ -37,7 +39,7 @@ describe('UsersService', () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [UsersService, UserRepository],
+            providers: [UsersService, UserRepository, TagsService, TagRepository],
             imports: [
                 ConfigModule.forRoot({
                     envFilePath: `.${process.env.NODE_ENV}.env`
@@ -53,8 +55,8 @@ describe('UsersService', () => {
                     autoLoadModels: true
                 }),
                 SequelizeModule.forFeature([User, Tag, UserTags]),
-                JwtModule
-                // TagsModule,
+                JwtModule,
+                // TagsModule
                 // forwardRef(() => AuthModule)
             ]
         }).compile();
@@ -67,7 +69,7 @@ describe('UsersService', () => {
         expect(service).toBeDefined();
     });
 
-    describe('findAll', () => {
+    describe('GetAllUsers', () => {
         it('should return an array of users', async () => {
             const result: User[] = [
                 await userRepository.createUser({name: "Sasha", email: "s@gmail.com", password: "123"}),
@@ -78,9 +80,9 @@ describe('UsersService', () => {
 
             jest.spyOn(service['userRepository'], 'findAll').mockResolvedValue(result);
 
-            expect(await service.findAll()).toBe(result);
-            expect((await service.findAll()).length).toBe(2);
-            expect(typeof(await service.findAll())).toEqual('object')
+            expect(await service.GetAllUsers()).toBe(result);
+            expect((await service.GetAllUsers()).length).toBe(2);
+            expect(typeof(await service.GetAllUsers())).toEqual("object")
         });
     });
 });
