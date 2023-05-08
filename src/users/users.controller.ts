@@ -43,16 +43,16 @@ export class UsersController {
     //     }
     // }
 
-    @ApiOperation({ summary: "Getting user by id" })
-    @ApiResponse({ status: 200, type: User })
-    @Get(':id')
-    // @UseGuards(JwtAuthGuard)
-    getUserById(@Param('id') id: number) {
-        return this.usersService.getUserById(id);
-    }
+    // @ApiOperation({ summary: "Getting user by id" })
+    // @ApiResponse({ status: 200, type: User })
+    // @Get(':id')
+    // // @UseGuards(JwtAuthGuard)
+    // getUserById(@Param('id') id: number) {
+    //     return this.usersService.getUserById(id);
+    // }
 
-    @ApiOperation({ summary: "Getting current user (only after login !)" })
-    @ApiResponse({ status: 200, type: User })
+    // @ApiOperation({ summary: "Getting current user (only after login !)" })
+    // @ApiResponse({ status: 200, type: User })
 
 
     @ApiOperation({ summary: "User creation" })
@@ -66,6 +66,12 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     addTagToUser(@Body() dto: AddTagDto, @Request() req) {
         return this.usersService.addTagToUser(dto, req);
+    }
+
+    @Put('add-tag-by-two-fields')
+    @UseGuards(JwtAuthGuard)
+    addTagToUserByTwoTagsFields(@Body() dto: AddTagDto[], @Request() req) {
+        return this.usersService.addTagsToUserByTwoTagsFields(dto, req.user.id);
     }
 
 }

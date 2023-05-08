@@ -19,8 +19,8 @@ export class AuthController {
     return this.authService.registration(userDto);
   }
 
-  @Get('get-current-user')
   @UseGuards(JwtAuthGuard)
+  @Get("/get-current-user")
   getUserProfile(@Request() req) {
     return this.authService.getCurrentUser(req);
   }

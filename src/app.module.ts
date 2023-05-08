@@ -7,6 +7,7 @@ import { TagsModule } from './tags/tags.module';
 import {Tag} from "./tags/tags.model";
 import {UserTags} from "./tags/user-tags.model";
 import {AuthModule} from "./auth/auth.module";
+import {JwtModule} from "@nestjs/jwt";
 
 @Module({
     controllers: [],
@@ -25,9 +26,11 @@ import {AuthModule} from "./auth/auth.module";
             models: [User, Tag, UserTags],
             autoLoadModels: true
         }),
+        // SequelizeModule.forFeature([User, Tag, UserTags]),
         UsersModule,
         TagsModule,
-        AuthModule
+        AuthModule,
+        JwtModule
     ]
 
 })
