@@ -34,7 +34,7 @@ export class TagsService {
         return user;
     }
 
-    async create(dto: CreateTagDto, ownerId) {
+    async createTag(dto: CreateTagDto, ownerId) {
         const tag = await this.tagRepository.create(dto, ownerId);
         return tag;
     }

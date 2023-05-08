@@ -8,6 +8,7 @@ import {Tag} from "../tags/tags.model";
 import { Op } from 'sequelize';
 import {UserRepository} from "./users.repository";
 import {UserTags} from "../tags/user-tags.model";
+import {TagRepository} from "../tags/tags.repository";
 
 
 @Injectable()
@@ -19,7 +20,9 @@ export class UsersService {
 
     constructor(private readonly userRepository: UserRepository,
                 private tagService: TagsService,
-                @InjectModel(UserTags) private userTagRepository: typeof UserTags
+                // private readonly tagRepository: TagRepository,
+                @InjectModel(UserTags) private userTagRepository: typeof UserTags,
+                @InjectModel(Tag) private tagRepository: typeof Tag
 
     ) {
     }
@@ -59,6 +62,7 @@ export class UsersService {
         try {
             const user = await this.userRepository.findByPk(req.user.id);
             const tag = await this.tagService.getTagByNameAndColor(dto.name, dto.color);
+
             // const alreadyExists = await this.user_tagRepository.findOne({where: {userId: user.id, tagId: tag.id}})
             //
             // if (alreadyExists) {
@@ -79,13 +83,30 @@ export class UsersService {
 
         try {
 
-            // const arrayFoundsTags = await this.tagService.findAllUsersT(tags)
-            //
+            const arrayFoundsTags: Tag[] = await this.tagService.findAllUsersT(tags)
+
+            const arrayEq = arrayFoundsTags.map((tag) => {
+                const tagItem: any = {name: tag.name, color: tag.color}
+                return tagItem
+            })
+
+            const resultArray: Array<object> = tags.filter(item1 => !arrayEq.some(item2 => item1.name === item2.name && item1.color === item2.color));
+
             // for (const tag of tags) {
-            //     if(!arrayFoundsTags.includes(tag)) {
-            //
+            //     if (arrayP.includes(tag)) {
+            //         resArray.push(tag)
             //     }
             // }
+
+            const arrayForBulkCreate = resultArray.map((tag) => {
+                const tagEq = {name: '', color: '', ownerId: 0}
+                tagEq.ownerId = currentUserId;
+                tagEq.name = tag['name'];
+                tagEq.color = tag['color'];
+                return tagEq;
+            });
+
+            await this.tagRepository.bulkCreate(arrayForBulkCreate);
 
             const tagEntities: Tag[] = [];
 
@@ -94,7 +115,7 @@ export class UsersService {
                 if (tagEntity) {
                     tagEntities.push(tagEntity);
                 } else {
-                    const tagEntity = await this.tagService.create({name: tag.name, color: tag.color}, currentUserId)
+                    const tagEntity = await this.tagService.createTag({name: tag.name, color: tag.color}, currentUserId)
                     tagEntities.push(tagEntity);
                 }
             }
