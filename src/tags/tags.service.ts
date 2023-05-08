@@ -24,18 +24,26 @@ export class TagsService {
         return tags;
     }
 
-    // async getTagById(id: number) {
-    //     const user = await this.tagRepository.findOne({where: { id }});
-    //     return user;
-    // }
+    async getTagById(id: number) {
+        const user = await this.tagRepository.getTagById(id);
+        return user;
+    }
     //
     async getTagByNameAndColor(name: string, color: string) {
         const user = await this.tagRepository.getTagByNameAndColor(name, color);
         return user;
     }
 
+    async create(dto: CreateTagDto, ownerId) {
+        const tag = await this.tagRepository.create(dto, ownerId);
+        return tag;
+    }
+
     // async findOrCreateTags(tags: Array<any>, currentUserId: number) {
     //     return findOrCreateTags(tags, currentUserId)
     // }
 
+    async findAllUsersT(tags) {
+        return await this.tagRepository.findAllT(tags)
+    }
 }

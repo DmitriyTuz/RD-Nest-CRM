@@ -7,6 +7,8 @@ import {TagsService} from "../tags/tags.service";
 import {Tag} from "../tags/tags.model";
 import { Op } from 'sequelize';
 import {UserRepository} from "./users.repository";
+import {UserTags} from "../tags/user-tags.model";
+
 
 @Injectable()
 export class UsersService {
@@ -16,8 +18,11 @@ export class UsersService {
     // ) {}
 
     constructor(private readonly userRepository: UserRepository,
-                private tagService: TagsService
-    ) {}
+                private tagService: TagsService,
+                @InjectModel(UserTags) private userTagRepository: typeof UserTags
+
+    ) {
+    }
 
     async GetAllUsers() {
         const users = await this.userRepository.findAll();
@@ -30,7 +35,7 @@ export class UsersService {
     }
 
     async getUserProfile(userId) {
-        const user = await this.userRepository.getUserById({where: { id: userId }});
+        const user = await this.userRepository.getUserById({where: {id: userId}});
         return user;
     }
 
@@ -68,6 +73,52 @@ export class UsersService {
         } catch (e) {
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    async addTagsToUserByTwoTagsFields(tags: { name: string, color: string }[], currentUserId)/*: Promise<void>*/ {
+
+        try {
+
+            // const arrayFoundsTags = await this.tagService.findAllUsersT(tags)
+            //
+            // for (const tag of tags) {
+            //     if(!arrayFoundsTags.includes(tag)) {
+            //
+            //     }
+            // }
+
+            const tagEntities: Tag[] = [];
+
+            for (const tag of tags) {
+                const tagEntity = await this.tagService.getTagByNameAndColor(tag.name, tag.color);
+                if (tagEntity) {
+                    tagEntities.push(tagEntity);
+                } else {
+                    const tagEntity = await this.tagService.create({name: tag.name, color: tag.color}, currentUserId)
+                    tagEntities.push(tagEntity);
+                }
+            }
+
+            await this.userTagRepository.destroy({
+                where: {
+                    userId: currentUserId,
+                },
+            });
+
+            const currentUserTagEntities = tagEntities.map((tag) => {
+                // const userTag = new UserTags();
+                const userTag = {userId: 0, tagId: 0}
+                userTag.userId = currentUserId;
+                userTag.tagId = tag.id;
+                return userTag;
+            });
+
+            await this.userTagRepository.bulkCreate(currentUserTagEntities);
+
+        } catch (e) {
+            console.log('!!! Error = ', e.message)
+        }
+
     }
 
     // async getUsersByTagIds(tagIds: number[], userId): Promise<User[]> {

@@ -29,7 +29,7 @@ import {forwardRef} from "@nestjs/common";
 import {AuthModule} from "../auth/auth.module";
 import {UserRepository} from "./users.repository";
 import {ConfigModule} from "@nestjs/config";
-import {JwtModule} from "@nestjs/jwt";
+import {JwtModule, JwtService} from "@nestjs/jwt";
 import {TagRepository} from "../tags/tags.repository";
 import {TagsService} from "../tags/tags.service";
 
@@ -39,23 +39,24 @@ describe('UsersService', () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [UsersService, UserRepository, TagsService, TagRepository],
+            providers: [UsersService, UserRepository, TagRepository, JwtService],
             imports: [
-                ConfigModule.forRoot({
-                    envFilePath: `.${process.env.NODE_ENV}.env`
-                }),
-                SequelizeModule.forRoot({
-                    dialect: 'postgres',
-                    host: process.env.POSTGRES_HOST,
-                    port: +process.env.POSTGRES_PORT,
-                    username: process.env.POSTGRES_USER,
-                    password: process.env.POSTGRES_PASSWORD,
-                    database: process.env.POSTGRES_DB,
-                    models: [User, Tag, UserTags],
-                    autoLoadModels: true
-                }),
+                // ConfigModule.forRoot({
+                //     envFilePath: `.${process.env.NODE_ENV}.env`
+                // }),
+                // SequelizeModule.forRoot({
+                //     dialect: 'postgres',
+                //     host: process.env.POSTGRES_HOST,
+                //     port: +process.env.POSTGRES_PORT,
+                //     username: process.env.POSTGRES_USER,
+                //     password: process.env.POSTGRES_PASSWORD,
+                //     database: process.env.POSTGRES_DB,
+                //     models: [User, Tag, UserTags],
+                //     autoLoadModels: true
+                // }),
                 SequelizeModule.forFeature([User, Tag, UserTags]),
-                JwtModule,
+                AppModule,
+                // JwtModule,
                 // TagsModule
                 // forwardRef(() => AuthModule)
             ]
