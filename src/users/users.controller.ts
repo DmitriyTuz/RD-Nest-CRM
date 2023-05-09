@@ -70,8 +70,8 @@ export class UsersController {
 
     @Put('add-tag-by-two-fields')
     @UseGuards(JwtAuthGuard)
-    addTagToUserByTwoTagsFields(@Body() dto: AddTagDto[], @Request() req) {
-        return this.usersService.addTagsToUserByTwoTagsFields(dto, req.user.id);
+    addTagToAuthUserByTwoTagsFields(@Body() dto: AddTagDto[], @Request() req) {
+        return this.usersService.addTagsToAuthUserByTwoTagsFields(dto, req.user.id);
     }
 
 }

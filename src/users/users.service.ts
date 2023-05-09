@@ -13,16 +13,10 @@ import {TagRepository} from "../tags/tags.repository";
 
 @Injectable()
 export class UsersService {
-    // constructor(
-    //     @InjectModel(User) private userRepository: typeof User,
-    //     // @InjectModel(UserTags) private user_tagRepository: typeof UserTags,
-    // ) {}
 
     constructor(private readonly userRepository: UserRepository,
                 private tagService: TagsService,
-                // private readonly tagRepository: TagRepository,
-                @InjectModel(UserTags) private userTagRepository: typeof UserTags,
-                @InjectModel(Tag) private tagRepository: typeof Tag
+                @InjectModel(UserTags) private userTagRepository: typeof UserTags
 
     ) {
     }
@@ -79,46 +73,25 @@ export class UsersService {
         }
     }
 
-    async addTagsToUserByTwoTagsFields(tags: { name: string, color: string }[], currentUserId)/*: Promise<void>*/ {
+    async addTagsToAuthUserByTwoTagsFields(tags: { name: string, color: string }[], currentUserId): Promise<void> {
 
         try {
 
-            const arrayFoundsTags: Tag[] = await this.tagService.findAllUsersT(tags)
+            const arrayFoundsTags: Tag[] = await this.tagService.findTagsByArrayOfNameAndColor(tags)
 
-            const arrayEq = arrayFoundsTags.map((tag) => {
-                const tagItem: any = {name: tag.name, color: tag.color}
-                return tagItem
-            })
+            const arrayNotFoundsTags: any = tags.filter(item1 => !arrayFoundsTags.some(item2 => item1.name === item2.name && item1.color === item2.color));
 
-            const resultArray: Array<object> = tags.filter(item1 => !arrayEq.some(item2 => item1.name === item2.name && item1.color === item2.color));
-
-            // for (const tag of tags) {
-            //     if (arrayP.includes(tag)) {
-            //         resArray.push(tag)
-            //     }
-            // }
-
-            const arrayForBulkCreate = resultArray.map((tag) => {
+            const arrayForBulkCreate = arrayNotFoundsTags.map((tag) => {
                 const tagEq = {name: '', color: '', ownerId: 0}
                 tagEq.ownerId = currentUserId;
-                tagEq.name = tag['name'];
-                tagEq.color = tag['color'];
+                tagEq.name = tag.name;
+                tagEq.color = tag.color;
                 return tagEq;
             });
 
-            await this.tagRepository.bulkCreate(arrayForBulkCreate);
+            await this.tagService.bulkCreateTags(arrayForBulkCreate);
 
-            const tagEntities: Tag[] = [];
-
-            for (const tag of tags) {
-                const tagEntity = await this.tagService.getTagByNameAndColor(tag.name, tag.color);
-                if (tagEntity) {
-                    tagEntities.push(tagEntity);
-                } else {
-                    const tagEntity = await this.tagService.createTag({name: tag.name, color: tag.color}, currentUserId)
-                    tagEntities.push(tagEntity);
-                }
-            }
+            const arrayFoundsTagsAfterCreate: Tag[] = await this.tagService.findTagsByArrayOfNameAndColor(tags)
 
             await this.userTagRepository.destroy({
                 where: {
@@ -126,7 +99,7 @@ export class UsersService {
                 },
             });
 
-            const currentUserTagEntities = tagEntities.map((tag) => {
+            const currentUserTagEntities = arrayFoundsTagsAfterCreate.map((tag) => {
                 // const userTag = new UserTags();
                 const userTag = {userId: 0, tagId: 0}
                 userTag.userId = currentUserId;
