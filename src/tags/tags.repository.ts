@@ -25,7 +25,7 @@ export class TagRepository {
     }
 
     async findTagsByArrayOfNameAndColor(tags): Promise<Tag[]> {
-        return this.tagModel.findAll({attributes:['name', 'color'], where: {[Op.or]: tags}});
+        return this.tagModel.findAll({where: {[Op.or]: tags}});
     }
 
     async getTagByNameAndColor(name: string, color: string) {
@@ -66,7 +66,5 @@ export class TagRepository {
     //     //     }
     //     // })
     // }
-    async bulkCreate(arrayForBulkCreate: any) {
 
-    }
 }

@@ -46,9 +46,8 @@ export class UsersController {
     // @ApiOperation({ summary: "Getting user by id" })
     // @ApiResponse({ status: 200, type: User })
     // @Get(':id')
-    // // @UseGuards(JwtAuthGuard)
-    // getUserById(@Param('id') id: number) {
-    //     return this.usersService.getUserById(id);
+    // async getUserById(@Param('id') id: number): Promise<User> {
+    //     return await this.usersService.getUserById(id);
     // }
 
     // @ApiOperation({ summary: "Getting current user (only after login !)" })

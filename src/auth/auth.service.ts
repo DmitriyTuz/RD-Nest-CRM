@@ -45,7 +45,12 @@ export class AuthService {
   private async generateToken(user: User) {
     const payload = { name: user.name, email: user.email, id: user.id };
     return {
-      token: this.jwtService.sign(payload),
+      token: this.jwtService.sign(payload
+          , {
+        secret: process.env.PRIVATE_KEY || "SECRET",
+        expiresIn: "24h"
+      }
+      ),
     };
   }
 

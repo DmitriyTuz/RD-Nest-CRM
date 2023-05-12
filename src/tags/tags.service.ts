@@ -35,7 +35,7 @@ export class TagsService {
     }
 
     async bulkCreateTags(arrayForBulkCreate: any) {
-        await this.tagRepository.bulkCreate(arrayForBulkCreate)
+        await this.tagRepository.bulkCreateTags(arrayForBulkCreate)
     }
 
     async createTag(dto: CreateTagDto, ownerId) {
