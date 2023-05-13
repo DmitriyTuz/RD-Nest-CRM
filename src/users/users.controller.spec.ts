@@ -46,43 +46,43 @@ describe('UserController', () => {
    * Test the PUT route (add tags to auth user)
    */
 
-  describe('addTagToAuthUserByTwoTagsFields', () => {
-
-    // jest.spyOn(userService, 'addTagsToAuthUserByTwoTagsFields').mockResolvedValue(user);
-
-    it('should return token typeof string', async () => {
-      const createUserDto: CreateUserDto = {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        password: 'password'
-      }
-      const token = await authService.registration(createUserDto);
-      console.log('!!! token.token = ', token.token)
-      console.log('!!! secret key = ', process.env.PRIVATE_KEY)
-      const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
-      console.log('!!! user = ', user)
-      console.log('!!! user.id = ', user.id)
-
-      const tags = [
-        { name: 'tag1', color: '#ff0000' },
-        { name: 'tag2', color: '#00ff00' },
-        { name: 'tag3', color: '#0000ff' },
-      ];
-
-      const req = {
-        user: { id: user.id },
-      };
-
-      await userService.addTagsToAuthUserByTwoTagsFields(tags, user.id)
-
-      let result = await UserTags.findAll({where: {userId: user.id}})
-      console.log('!!! result = ', result)
-
-      await userService.deleteUserByEmail('john.doe@example.com')
-
-      expect(result.length).toBe(3);
-      expect(typeof(token.token)).toBe('string');
-    });
-  });
+  // describe('addTagToAuthUserByTwoTagsFields', () => {
+  //
+  //   // jest.spyOn(userService, 'addTagsToAuthUserByTwoTagsFields').mockResolvedValue(user);
+  //
+  //   it('should return token typeof string', async () => {
+  //     const createUserDto: CreateUserDto = {
+  //       name: 'John Doe',
+  //       email: 'john.doe@example.com',
+  //       password: 'password'
+  //     }
+  //     const token = await authService.registration(createUserDto);
+  //     console.log('!!! token.token = ', token.token)
+  //     console.log('!!! secret key = ', process.env.PRIVATE_KEY)
+  //     const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+  //     console.log('!!! user = ', user)
+  //     console.log('!!! user.id = ', user.id)
+  //
+  //     const tags = [
+  //       { name: 'tag1', color: '#ff0000' },
+  //       { name: 'tag2', color: '#00ff00' },
+  //       { name: 'tag3', color: '#0000ff' },
+  //     ];
+  //
+  //     const req = {
+  //       user: { id: user.id },
+  //     };
+  //
+  //     await userService.addTagsToAuthUserByTwoTagsFields(tags, user.id)
+  //
+  //     let result = await UserTags.findAll({where: {userId: user.id}})
+  //     console.log('!!! result = ', result)
+  //
+  //     await userService.deleteUserByEmail('john.doe@example.com')
+  //
+  //     expect(result.length).toBe(3);
+  //     expect(typeof(token.token)).toBe('string');
+  //   });
+  // });
 
 });

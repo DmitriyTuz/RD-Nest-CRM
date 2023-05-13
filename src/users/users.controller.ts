@@ -5,7 +5,7 @@ import {
     Post,
     UseGuards,
     Request,
-    Query, Param, HttpStatus, HttpException, Put
+    Query, Param, HttpStatus, HttpException, Put, UsePipes
 } from "@nestjs/common";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
@@ -13,6 +13,7 @@ import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {AddTagDto} from "./dto/add-tag.dto";
+import {ValidationPipe} from "../validation.pipe";
 
 @ApiTags("Users")
 @Controller('users')
@@ -56,6 +57,7 @@ export class UsersController {
 
     @ApiOperation({ summary: "User creation" })
     @ApiResponse({ status: 200, type: User })
+    @UsePipes(ValidationPipe)
     @Post('create-user')
     create(@Body() userDto: CreateUserDto) {
         return this.usersService.createUser(userDto);
