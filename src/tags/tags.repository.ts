@@ -24,7 +24,7 @@ export class TagRepository {
         return this.tagModel.findAll({include: {all: true}});
     }
 
-    async findAllT(tags): Promise<Tag[]> {
+    async findTagsByArrayOfNameAndColor(tags): Promise<Tag[]> {
         return this.tagModel.findAll({where: {[Op.or]: tags}});
     }
 
@@ -42,6 +42,11 @@ export class TagRepository {
         const tag = await this.tagModel.create({...dto, ownerId: ownerId});
         return tag;
     }
+
+    async bulkCreateTags(arrayForBulkCreate: any) {
+        await this.tagModel.bulkCreate(arrayForBulkCreate)
+    }
+
     // async findOrCreateTags(tags, currentUserId) {
     //     // const p = [];
     //     // const s = [];
@@ -61,4 +66,5 @@ export class TagRepository {
     //     //     }
     //     // })
     // }
+
 }

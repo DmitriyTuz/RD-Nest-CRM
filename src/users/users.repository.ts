@@ -16,8 +16,7 @@ export class UserRepository {
     }
 
     async getUserById(id) {
-        const user = await this.userModel.findOne({where: { id }});
-        return user;
+        return await this.userModel.findOne({where: { id }});
     }
 
     async findByPk(id) {

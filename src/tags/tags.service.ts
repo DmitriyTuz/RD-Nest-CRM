@@ -34,7 +34,11 @@ export class TagsService {
         return user;
     }
 
-    async create(dto: CreateTagDto, ownerId) {
+    async bulkCreateTags(arrayForBulkCreate: any) {
+        await this.tagRepository.bulkCreateTags(arrayForBulkCreate)
+    }
+
+    async createTag(dto: CreateTagDto, ownerId) {
         const tag = await this.tagRepository.create(dto, ownerId);
         return tag;
     }
@@ -43,7 +47,7 @@ export class TagsService {
     //     return findOrCreateTags(tags, currentUserId)
     // }
 
-    async findAllUsersT(tags) {
-        return await this.tagRepository.findAllT(tags)
+    async findTagsByArrayOfNameAndColor(tags) {
+        return await this.tagRepository.findTagsByArrayOfNameAndColor(tags)
     }
 }

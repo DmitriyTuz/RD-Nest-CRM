@@ -1,45 +1,43 @@
-import { INestApplication } from '@nestjs/common';
+import { Sequelize } from 'sequelize-typescript';
+import { User } from '../../src/users/users.model';
 import { Test } from '@nestjs/testing';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { AppModule } from '../../src/app.module';
-import {ConfigModule} from "@nestjs/config";
-import {User} from "../../src/users/users.model";
-import {Tag} from "../../src/tags/tags.model";
-import {UserTags} from "../../src/tags/user-tags.model";
+import {UsersModule} from "../../dist/users/users.module";
+import {INestApplication} from "@nestjs/common";
+import {AuthModule} from "../../dist/auth/auth.module";
+import {AuthService} from "../../dist/auth/auth.service";
 
 export class TestHelper {
 
-    constructor(private app: INestApplication) {}
+    app: INestApplication;
 
-    public async startApp() {
-        const moduleRef = await Test.createTestingModule({
-            imports: [
-                AppModule,
-                ConfigModule.forRoot({
-                    envFilePath: `.${process.env.NODE_ENV}.env`
-                }),
-                SequelizeModule.forRoot({
-                    dialect: 'postgres',
-                    host: process.env.POSTGRES_HOST,
-                    port: +process.env.POSTGRES_PORT,
-                    username: process.env.POSTGRES_USER,
-                    password: process.env.POSTGRES_PASSWORD,
-                    database: process.env.POSTGRES_DB,
-                    models: [User, Tag, UserTags],
-                    autoLoadModels: true
-                }),
+    constructor(private readonly appModule: typeof AppModule,
+                private readonly userModule: typeof UsersModule,
+                private readonly authModule: typeof AuthModule
+                ) {
+    }
+
+    async init() {
+        const module = await Test.createTestingModule({
+            providers: [
+                {
+                    provide: AuthService,
+                    useValue: {
+                        getCurrentUser: jest.fn(),
+                    },
+                },
             ],
+            imports: [this.appModule, this.userModule, this.authModule]
+
         }).compile();
 
-        this.app = moduleRef.createNestApplication();
+        console.log('!!! secret key in helper = ', process.env.PRIVATE_KEY)
+        this.app = module.createNestApplication();
         await this.app.init();
     }
 
-    public async stopApp() {
+    async close() {
         await this.app.close();
     }
 
-    public getApp(): INestApplication {
-        return this.app;
-    }
 }

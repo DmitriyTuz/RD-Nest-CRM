@@ -5,7 +5,7 @@ import {
     Post,
     UseGuards,
     Request,
-    Query, Param, HttpStatus, HttpException, Put
+    Query, Param, HttpStatus, HttpException, Put, UsePipes
 } from "@nestjs/common";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
@@ -13,6 +13,7 @@ import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {AddTagDto} from "./dto/add-tag.dto";
+import {ValidationPipe} from "../validation.pipe";
 
 @ApiTags("Users")
 @Controller('users')
@@ -46,9 +47,8 @@ export class UsersController {
     // @ApiOperation({ summary: "Getting user by id" })
     // @ApiResponse({ status: 200, type: User })
     // @Get(':id')
-    // // @UseGuards(JwtAuthGuard)
-    // getUserById(@Param('id') id: number) {
-    //     return this.usersService.getUserById(id);
+    // async getUserById(@Param('id') id: number): Promise<User> {
+    //     return await this.usersService.getUserById(id);
     // }
 
     // @ApiOperation({ summary: "Getting current user (only after login !)" })
@@ -57,6 +57,7 @@ export class UsersController {
 
     @ApiOperation({ summary: "User creation" })
     @ApiResponse({ status: 200, type: User })
+    @UsePipes(ValidationPipe)
     @Post('create-user')
     create(@Body() userDto: CreateUserDto) {
         return this.usersService.createUser(userDto);
@@ -70,8 +71,8 @@ export class UsersController {
 
     @Put('add-tag-by-two-fields')
     @UseGuards(JwtAuthGuard)
-    addTagToUserByTwoTagsFields(@Body() dto: AddTagDto[], @Request() req) {
-        return this.usersService.addTagsToUserByTwoTagsFields(dto, req.user.id);
+    addTagToAuthUserByTwoTagsFields(@Body() dto: AddTagDto[], @Request() req) {
+        return this.usersService.addTagsToAuthUserByTwoTagsFields(dto, req.user.id);
     }
 
 }

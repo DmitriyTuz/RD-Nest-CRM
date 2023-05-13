@@ -19,6 +19,6 @@ import {TagRepository} from "../tags/tags.repository";
       TagsModule,
       forwardRef(() => AuthModule)
   ],
-    exports: [UsersService]
+    exports: [UsersService, SequelizeModule]
 })
 export class UsersModule {}
