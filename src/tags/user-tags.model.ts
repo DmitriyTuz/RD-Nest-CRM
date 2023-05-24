@@ -25,4 +25,5 @@ export class UserTags extends Model<UserTags> {
     @ForeignKey(() => User)
     @Column({ type: DataType.INTEGER })
     userId: number;
+
 }

@@ -2,7 +2,7 @@ import {InjectModel} from "@nestjs/sequelize";
 import {Tag} from "./tags.model";
 import {User} from "../users/users.model";
 import {CreateTagDto} from "./dto/create-tag.dto";
-import {Op} from "sequelize";
+import {Op, Transaction} from "sequelize";
 
 
 // const getOneTag = async (findQuery, ownerId) => {
@@ -28,6 +28,11 @@ export class TagRepository {
         return this.tagModel.findAll({where: {[Op.or]: tags}});
     }
 
+    async findTagsByArrayOfNameAndColorWithTransaction(tags, transaction?: Transaction) {
+        // const options = transaction ? { transaction } : {};
+        return this.tagModel.findAll({where: {[Op.or]: tags}, transaction});
+    }
+
     async getTagByNameAndColor(name: string, color: string) {
         const user = await this.tagModel.findOne({where: { name, color }});
         return user;
@@ -45,6 +50,11 @@ export class TagRepository {
 
     async bulkCreateTags(arrayForBulkCreate: any) {
         await this.tagModel.bulkCreate(arrayForBulkCreate)
+    }
+
+    async bulkCreateTagsWithTransaction(arrayForBulkCreate: any, transaction?: Transaction): Promise<Tag[]> {
+        const options = transaction ? { transaction } : {};
+        return this.tagModel.bulkCreate(arrayForBulkCreate, options)
     }
 
     // async findOrCreateTags(tags, currentUserId) {

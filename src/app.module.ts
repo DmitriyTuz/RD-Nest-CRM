@@ -8,6 +8,10 @@ import {Tag} from "./tags/tags.model";
 import {UserTags} from "./tags/user-tags.model";
 import {AuthModule} from "./auth/auth.module";
 import {JwtModule, JwtService} from "@nestjs/jwt";
+import {UsersController} from "./users/users.controller";
+import {UsersService} from "./users/users.service";
+import {Transaction} from "sequelize";
+import {UserRepository} from "./users/users.repository";
 
 @Module({
     controllers: [],
@@ -24,9 +28,10 @@ import {JwtModule, JwtService} from "@nestjs/jwt";
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
             models: [User, Tag, UserTags],
-            autoLoadModels: true
+            autoLoadModels: true,
+            logging: false
         }),
-        // SequelizeModule.forFeature([User, Tag, UserTags]),
+        SequelizeModule.forFeature([User, Tag, UserTags]),
         UsersModule,
         TagsModule,
         AuthModule,

@@ -4,6 +4,7 @@ import {Tag} from "./tags.model";
 import {CreateTagDto} from "./dto/create-tag.dto";
 import {UserRepository} from "../users/users.repository";
 import {TagRepository} from "./tags.repository";
+import {Transaction} from "sequelize";
 
 @Injectable()
 export class TagsService {
@@ -38,6 +39,10 @@ export class TagsService {
         await this.tagRepository.bulkCreateTags(arrayForBulkCreate)
     }
 
+    async bulkCreateTagsWithTransaction(arrayForBulkCreate: any, transaction?: Transaction) {
+        return await this.tagRepository.bulkCreateTagsWithTransaction(arrayForBulkCreate, transaction)
+    }
+
     async createTag(dto: CreateTagDto, ownerId) {
         const tag = await this.tagRepository.create(dto, ownerId);
         return tag;
@@ -49,5 +54,9 @@ export class TagsService {
 
     async findTagsByArrayOfNameAndColor(tags) {
         return await this.tagRepository.findTagsByArrayOfNameAndColor(tags)
+    }
+
+    async findTagsByArrayOfNameAndColorWithTransaction(tags, transaction?: Transaction) {
+        return await this.tagRepository.findTagsByArrayOfNameAndColorWithTransaction(tags, transaction)
     }
 }
