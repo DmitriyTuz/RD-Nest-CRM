@@ -24,13 +24,15 @@ export class User extends Model<User, UserCreationAttrs> {
         unique: true,
         autoIncrement: true,
         primaryKey: true,
+        onDelete: 'CASCADE'
     })
     id: number;
 
     @ApiProperty({ example: "Alex", description: "name" })
     @Column({
         type: DataType.STRING,
-        allowNull: false
+        allowNull: false,
+        onDelete: 'CASCADE'
     })
     name: string;
 
@@ -38,14 +40,16 @@ export class User extends Model<User, UserCreationAttrs> {
     @Column({
         type: DataType.STRING,
         unique: true,
-        allowNull: false
+        allowNull: false,
+        onDelete: 'CASCADE'
     })
     email: string;
 
     @ApiProperty({ example: "1234567", description: "password" })
     @Column({
         type: DataType.STRING,
-        allowNull: false
+        allowNull: false,
+        onDelete: 'CASCADE'
     })
     password: string;
 

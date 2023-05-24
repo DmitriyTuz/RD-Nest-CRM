@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { User } from './users.model';
 import {CreateUserDto} from "./dto/create-user.dto";
 import {AddTagDto} from "./dto/add-tag.dto";
+import {Transaction} from "sequelize";
 
 @Injectable()
 export class UserRepository {
@@ -13,6 +14,11 @@ export class UserRepository {
 
     async findAll(): Promise<User[]> {
         return this.userModel.findAll();
+    }
+
+    async GetAllUsersWithTransaction(transaction?: Transaction) {
+        const options = transaction ? { transaction } : {};
+        return this.userModel.findAll(options);
     }
 
     async getUserById(id) {
@@ -29,11 +35,23 @@ export class UserRepository {
         return user;
     }
 
+    async createUserWithTransaction(dto: CreateUserDto, transaction?: Transaction) {
+        console.log('!!! transaction3.id = ', transaction['id'])
+        const options = transaction ? { transaction } : {};
+        const user = await this.userModel.create(dto, options);
+        return user;
+    }
+
     async getUserByEmail(email: string) {
         const user = await this.userModel.findOne({
             where: { email },
             include: { all: true },
         });
+        return user;
+    }
+
+    async deleteUserById(id) {
+        const user = await this.userModel.destroy({where: {id} });
         return user;
     }
 
@@ -62,4 +80,6 @@ export class UserRepository {
     //         throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
     //     }
     // }
+
+
 }

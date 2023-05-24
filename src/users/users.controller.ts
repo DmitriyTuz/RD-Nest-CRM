@@ -5,7 +5,7 @@ import {
     Post,
     UseGuards,
     Request,
-    Query, Param, HttpStatus, HttpException, Put, UsePipes
+    Query, Param, HttpStatus, HttpException, Put, UsePipes, Inject
 } from "@nestjs/common";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
@@ -14,6 +14,8 @@ import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {AddTagDto} from "./dto/add-tag.dto";
 import {ValidationPipe} from "../validation.pipe";
+import {Transaction} from "sequelize";
+// import { Transaction } from 'sequelize-transactional-cls-hooked';
 
 @ApiTags("Users")
 @Controller('users')
@@ -30,7 +32,6 @@ export class UsersController {
         } catch (e) {
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
-
     }
 
     // @Get('find-by-tags')
@@ -63,6 +64,17 @@ export class UsersController {
         return this.usersService.createUser(userDto);
     }
 
+    @ApiOperation({ summary: "User creation" })
+    @ApiResponse({ status: 200, type: User })
+    @UsePipes(ValidationPipe)
+    @UseGuards(JwtAuthGuard)
+    @Post('create-user-with-transaction')
+    async createUserWithTransaction(@Body() userDto: CreateUserDto, @Request() req, transaction?: Transaction) {
+        if (req.transaction) { transaction = await req.transaction }
+        console.log('!!! transaction2.id = ', transaction['id'])
+        return this.usersService.createUserWithTransaction(userDto, transaction);
+    }
+
     @Put('add-tag')
     @UseGuards(JwtAuthGuard)
     addTagToUser(@Body() dto: AddTagDto, @Request() req) {
@@ -75,5 +87,16 @@ export class UsersController {
         return this.usersService.addTagsToAuthUserByTwoTagsFields(dto, req.user.id);
     }
 
+    @Put('add-tags-by-array-of-two-fields')
+    @UseGuards(JwtAuthGuard)
+
+    addTagToAuthUserByTwoTagsFieldsWithTransaction(@Body() dto: AddTagDto[], @Request() req, transaction?: Transaction) {
+        // if (req.transaction) { transaction = req.transaction }
+        // console.log('!!! transaction2.id = ', transaction['id'])
+        console.log('!!! dto = ', dto)
+        console.log('!!! req.user.id = ', req.user.id)
+        console.log('!!! transaction = ', transaction)
+        return this.usersService.addTagsWithTransaction(dto, req.user.id, transaction);
+    }
 }
 

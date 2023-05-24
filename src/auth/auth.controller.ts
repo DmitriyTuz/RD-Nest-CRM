@@ -1,8 +1,10 @@
-import {Body, Controller, Get, Post, Request, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, Post, Request, UseGuards, UsePipes} from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { CreateUserDto } from "../users/dto/create-user.dto";
 import { AuthService } from "./auth.service";
 import {JwtAuthGuard} from "./jwt-auth.guard";
+import {ValidationPipe} from "../validation.pipe";
+import {Transaction} from "sequelize";
 
 @ApiTags("Authorization")
 @Controller("auth")
@@ -14,6 +16,7 @@ export class AuthController {
     return this.authService.login(userDto);
   }
 
+  @UsePipes(ValidationPipe)
   @Post("/registration")
   registration(@Body() userDto: CreateUserDto) {
     return this.authService.registration(userDto);
