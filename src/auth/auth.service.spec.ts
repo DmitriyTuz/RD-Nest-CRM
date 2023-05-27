@@ -13,7 +13,7 @@ describe('AuthService', () => {
     let userService: UsersService
 
     beforeAll(async () => {
-        testHelper = new TestHelper(AppModule, UsersModule);
+        testHelper = new TestHelper(AppModule);
         await testHelper.init();
 
         authService = testHelper.app.get<AuthService>(AuthService);
