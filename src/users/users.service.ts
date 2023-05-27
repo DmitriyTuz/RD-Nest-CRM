@@ -63,9 +63,6 @@ export class UsersService {
         } catch (e) {
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
-
-
-
     }
 
     async getUserByEmail(email: string) {

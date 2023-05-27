@@ -60,7 +60,7 @@ export class UsersController {
     @ApiResponse({ status: 200, type: User })
     @UsePipes(ValidationPipe)
     @Post('create-user')
-    create(@Body() userDto: CreateUserDto) {
+    createUser(@Body() userDto: CreateUserDto) {
         return this.usersService.createUser(userDto);
     }
 
@@ -81,7 +81,7 @@ export class UsersController {
         return this.usersService.addTagToUser(dto, req);
     }
 
-    @Put('add-tag-by-two-fields')
+    @Put('add-tags-by-two-fields')
     @UseGuards(JwtAuthGuard)
     addTagToAuthUserByTwoTagsFields(@Body() dto: AddTagDto[], @Request() req) {
         return this.usersService.addTagsToAuthUserByTwoTagsFields(dto, req.user.id);

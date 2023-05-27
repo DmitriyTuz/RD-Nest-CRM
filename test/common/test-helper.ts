@@ -9,6 +9,7 @@ import {AuthService} from "../../src/auth/auth.service";
 import {Tag} from "../../src/tags/tags.model";
 import {UserTags} from "../../src/tags/user-tags.model";
 import sequelizeConfig from "../../config/sequelize.config";
+import {TransactionWrapperService} from "../../src/helpers/transaction-wrapper.service";
 
 export class TestHelper {
 
@@ -17,7 +18,7 @@ export class TestHelper {
 
     constructor(private readonly appModule: typeof AppModule,
                 private readonly userModule: typeof UsersModule,
-                private readonly authModule: typeof AuthModule
+                // private readonly authModule: typeof AuthModule
                 ) {
 
         // this.sequelize = new Sequelize({
@@ -34,19 +35,20 @@ export class TestHelper {
     async init() {
         const module = await Test.createTestingModule({
             providers: [
-                {
-                    provide: AuthService,
-                    useValue: {
-                        getCurrentUser: jest.fn(),
-                    },
-                },
+                // TransactionWrapperService,
+                // {
+                //     provide: AuthService,
+                //     useValue: {
+                //         getCurrentUser: jest.fn(),
+                //     },
+                // },
 
                 // {
                 //     provide: Sequelize,
                 //     useValue: new Sequelize(sequelizeConfig),
                 // },
             ],
-            imports: [this.appModule, this.userModule, this.authModule]
+            imports: [this.appModule, this.userModule]
 
         }).compile();
 
@@ -56,13 +58,12 @@ export class TestHelper {
     }
 
     async clearDatabase(): Promise<void> {
-        await UserTags.destroy({where: {}});
+        // await UserTags.destroy({where: {}});
+        await User.destroy({where: {}});
         await Tag.destroy({where: {}});
-
-
+        await UserTags.destroy({where: {}});
 
         // await User.truncate({ cascade: true });
-        await User.destroy({where: {}});
     }
 
     async close() {

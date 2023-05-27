@@ -22,13 +22,13 @@ describe('UserService', () => {
   let jwtService: JwtService
 
   beforeAll(async () => {
-    testHelper = new TestHelper(UsersModule, AppModule, AuthModule);
+    testHelper = new TestHelper(AppModule, UsersModule);
     await testHelper.init();
     userService = testHelper.app.get<UsersService>(UsersService);
     authService = testHelper.app.get<AuthService>(AuthService);
     jwtService = testHelper.app.get<JwtService>(JwtService);
 
-    sequelize = await testHelper.app.get<Sequelize>(Sequelize)
+    // sequelize = await testHelper.app.get<Sequelize>(Sequelize)
     // transaction = await sequelize.transaction();
 
     // sequelize = new Sequelize(sequelizeConfig);
@@ -38,44 +38,51 @@ describe('UserService', () => {
 //--------------------------------------------------------------
     // !!! use for transactions
 
-    beforeEach(async () => {
-        // sequelize = await testHelper.app.get<Sequelize>(Sequelize)
-        transaction = await sequelize.transaction();
-    });
-
-    afterEach(async () => {
-      await transaction.rollback();
-      // await testHelper.clearDatabase();
-    });
+    // beforeEach(async () => {
+    //     // sequelize = await testHelper.app.get<Sequelize>(Sequelize)
+    //     transaction = await sequelize.transaction();
+    // });
+    //
+    // afterEach(async () => {
+    //   await transaction.rollback();
+    //   // await testHelper.clearDatabase();
+    // });
 //--------------------------------------------------------------
+
+  beforeEach(async () => {
+    await testHelper.clearDatabase();
+    // await User.destroy({where: {}});
+  })
 
   // afterEach(async () => {
   //   await testHelper.clearDatabase();
   // });
 
   afterAll(async () => {
+    await testHelper.clearDatabase();
+    // await User.destroy({where: {}});
     // await sequelize.close();
     await testHelper.close();
   });
 
-  // describe('GetAllUsers', () => {
-  //   it('should return an array of users', async () => {
-  //     let createUserDto: CreateUserDto = {
-  //       name: 'John Doe',
-  //       email: 'john1.doe@example.com',
-  //       password: 'password',
-  //     };
-  //
-  //     user = await userService.createUser(createUserDto);
-  //     const users = await userService.GetAllUsers();
-  //
-  //     expect(users).toHaveLength(1);
-  //     expect(users[0]).toBeInstanceOf(User);
-  //     expect(users[0].name).toEqual(createUserDto.name);
-  //     expect(users[0].email).toEqual(createUserDto.email);
-  //
-  //   });
-  // });
+  describe('GetAllUsers', () => {
+    it('should return an array of users', async () => {
+      let createUserDto: CreateUserDto = {
+        name: 'John Doe',
+        email: 'john3.doe@example.com',
+        password: 'password',
+      };
+
+      await userService.createUser(createUserDto);
+      const users = await userService.GetAllUsers();
+
+      expect(users).toHaveLength(1);
+      expect(users[0]).toBeInstanceOf(User);
+      expect(users[0].name).toEqual(createUserDto.name);
+      expect(users[0].email).toEqual(createUserDto.email);
+
+    });
+  });
 
   describe('GET - GetAllUsers', () => {
     it('should return an array of users', async () => {
@@ -84,58 +91,92 @@ describe('UserService', () => {
     });
   });
 
-  describe('POST - CreateUserWithTransaction', () => {
-    it('should return user', async () => {
-
-      let createUserDto: CreateUserDto = {
+  describe('PUT - addTagsToAuthUserByTwoTagsFields', () => {
+    it('should return token typeof string', async () => {
+      const createTestUserDto: CreateUserDto = {
         name: 'John Doe',
-        email: 'john.doe@example.com',
-        password: 'password',
+        email: 'john4.doe@example.com',
+        password: 'password'
+      }
+
+      const token = await authService.registration(createTestUserDto);
+      const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      expect(createTestUserDto.email).toBe(user.email);
+      expect(typeof(token.token)).toBe('string');
+
+      const tags = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' },
+        { name: 'tag3', color: '#0000ff' },
+      ];
+
+      const req = {
+        user: { id: user.id },
       };
 
-      const user = await userService.createUserWithTransaction(createUserDto, transaction);
+      await userService.addTagsToAuthUserByTwoTagsFields(tags, req.user.id);
 
-      expect(user).toBeDefined();
-      expect(user.name).toBe(createUserDto.name);
-      expect(user.email).toBe(createUserDto.email);
-      expect(user.password).toBe(createUserDto.password);
+      let result = await UserTags.findAll({where: {userId: user.id}, transaction})
+      expect(result.length).toBe(3);
+      expect(typeof(token.token)).toBe('string');
 
+      // await transaction.commit()
     });
   });
 
-    describe('PUT - addTagWithTransaction', () => {
-        it('should return token typeof string', async () => {
-            const createTestUserDto: CreateUserDto = {
-                name: 'John Doe',
-                email: 'john2.doe@example.com',
-                password: 'password'
-            }
-
-            const token = await authService.registrationWithTransaction(createTestUserDto, transaction);
-            const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
-
-            expect(createTestUserDto.email).toBe(user.email);
-            expect(typeof(token.token)).toBe('string');
-
-            const tags = [
-                { name: 'tag1', color: '#ff0000' },
-                { name: 'tag2', color: '#00ff00' },
-                { name: 'tag3', color: '#0000ff' },
-            ];
-
-            const req = {
-                user: { id: user.id },
-            };
-
-            await userService.addTagsWithTransaction(tags, req.user.id, transaction);
-
-            let result = await UserTags.findAll({where: {userId: user.id}, transaction})
-            expect(result.length).toBe(3);
-            expect(typeof(token.token)).toBe('string');
-
-            // await transaction.commit()
-        });
-    });
+  // describe('POST - CreateUserWithTransaction', () => {
+  //   it('should return user', async () => {
+  //
+  //     let createUserDto: CreateUserDto = {
+  //       name: 'John Doe',
+  //       email: 'john.doe@example.com',
+  //       password: 'password',
+  //     };
+  //
+  //     const user = await userService.createUserWithTransaction(createUserDto, transaction);
+  //
+  //     expect(user).toBeDefined();
+  //     expect(user.name).toBe(createUserDto.name);
+  //     expect(user.email).toBe(createUserDto.email);
+  //     expect(user.password).toBe(createUserDto.password);
+  //
+  //   });
+  // });
+  //
+  //   describe('PUT - addTagWithTransaction', () => {
+  //       it('should return token typeof string', async () => {
+  //           const createTestUserDto: CreateUserDto = {
+  //               name: 'John Doe',
+  //               email: 'john2.doe@example.com',
+  //               password: 'password'
+  //           }
+  //
+  //           const token = await authService.registrationWithTransaction(createTestUserDto, transaction);
+  //           const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+  //
+  //           expect(createTestUserDto.email).toBe(user.email);
+  //           expect(typeof(token.token)).toBe('string');
+  //
+  //           const tags = [
+  //               { name: 'tag1', color: '#ff0000' },
+  //               { name: 'tag2', color: '#00ff00' },
+  //               { name: 'tag3', color: '#0000ff' },
+  //           ];
+  //
+  //           const req = {
+  //               user: { id: user.id },
+  //           };
+  //
+  //           await userService.addTagsWithTransaction(tags, req.user.id, transaction);
+  //
+  //           let result = await UserTags.findAll({where: {userId: user.id}, transaction})
+  //           expect(result.length).toBe(3);
+  //           expect(typeof(token.token)).toBe('string');
+  //
+  //           // await transaction.commit()
+  //       });
+  //   });
 
 
   // describe('GetAllUsersWithTransaction', () => {
