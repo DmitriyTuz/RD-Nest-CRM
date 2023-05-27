@@ -4,7 +4,7 @@ import {Tag} from "../src/tags/tags.model";
 import {UserTags} from "../src/tags/user-tags.model";
 
 const sequelizeConfig: SequelizeOptions = {
-    database: 'RaDevs-db-test',
+    database: 'RaDevs-db',
     username: 'postgres',
     password: '1111',
     host: 'localhost',

@@ -75,6 +75,15 @@ export class UsersController {
         return this.usersService.createUserWithTransaction(userDto, transaction);
     }
 
+    @ApiOperation({ summary: "User creation" })
+    @ApiResponse({ status: 200, type: User })
+    @UsePipes(ValidationPipe)
+    // @UseGuards(JwtAuthGuard)
+    @Post('create-user-with-transaction-test')
+    async createUserTest(@Body() userDto: CreateUserDto) {
+        return this.usersService.createUserTest(userDto);
+    }
+
     @Put('add-tag')
     @UseGuards(JwtAuthGuard)
     addTagToUser(@Body() dto: AddTagDto, @Request() req) {
