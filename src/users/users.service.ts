@@ -56,6 +56,15 @@ export class UsersService {
         }
     }
 
+    async createUserTest(dto: CreateUserDto) {
+        try {
+            const user = await this.userRepository.createUserTest(dto);
+            return user;
+        } catch (e) {
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     async createUserWithTransaction(dto: CreateUserDto, transaction?: Transaction) {
         try {
             const user = await this.userRepository.createUserWithTransaction(dto, transaction);
@@ -221,8 +230,6 @@ export class UsersService {
     //         ]
     //     });
     // }
-
-
 }
 
 
