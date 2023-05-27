@@ -18,7 +18,7 @@ export class TestHelper {
 
     constructor(private readonly appModule: typeof AppModule,
                 private readonly userModule: typeof UsersModule,
-                private readonly authModule: typeof AuthModule
+                // private readonly authModule: typeof AuthModule
                 ) {
 
         // this.sequelize = new Sequelize({
@@ -48,7 +48,7 @@ export class TestHelper {
                 //     useValue: new Sequelize(sequelizeConfig),
                 // },
             ],
-            imports: [this.appModule, this.userModule, this.authModule]
+            imports: [this.appModule, this.userModule]
 
         }).compile();
 

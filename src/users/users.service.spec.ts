@@ -22,7 +22,7 @@ describe('UserService', () => {
   let jwtService: JwtService
 
   beforeAll(async () => {
-    testHelper = new TestHelper(UsersModule, AppModule, AuthModule);
+    testHelper = new TestHelper(AppModule, UsersModule);
     await testHelper.init();
     userService = testHelper.app.get<UsersService>(UsersService);
     authService = testHelper.app.get<AuthService>(AuthService);

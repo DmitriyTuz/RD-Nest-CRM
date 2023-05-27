@@ -57,7 +57,9 @@ describe('UserController', () => {
     // await app.init();
 
     // transactionWrapper = testHelper.app.get<TransactionWrapperService>(TransactionWrapperService);
-    testHelper = await new TestHelper(UsersModule, AppModule, AuthModule);
+
+    // testHelper = await new TestHelper(AppModule, UsersModule,  AuthModule);
+    testHelper = await new TestHelper(AppModule, UsersModule);
     await testHelper.init();
     userController = await testHelper.app.get<UsersController>(UsersController);
     userService = testHelper.app.get<UsersService>(UsersService);

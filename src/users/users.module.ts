@@ -13,12 +13,12 @@ import {TagRepository} from "../tags/tags.repository";
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, UserRepository, TagsService, TagRepository],
+  providers: [UsersService, UserRepository],
   imports: [
       SequelizeModule.forFeature([User, Tag, UserTags]),
       TagsModule,
       forwardRef(() => AuthModule)
   ],
-    exports: [UsersService, SequelizeModule]
+    exports: [UsersService]
 })
 export class UsersModule {}

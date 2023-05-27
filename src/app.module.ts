@@ -31,12 +31,12 @@ import {UserRepository} from "./users/users.repository";
             autoLoadModels: true,
             logging: false
         }),
-        SequelizeModule.forFeature([User, Tag, UserTags]),
+        // SequelizeModule.forFeature([User, Tag, UserTags]),
         UsersModule,
         TagsModule,
         AuthModule,
         JwtModule
-    ]
+    ],
 
 })
 export class AppModule {}
