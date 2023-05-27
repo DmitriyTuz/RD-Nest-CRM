@@ -15,7 +15,7 @@ describe('AuthController', () => {
   let userService: UsersService
 
   beforeAll(async () => {
-    testHelper = new TestHelper(AppModule, UsersModule);
+    testHelper = new TestHelper(AppModule);
     await testHelper.init();
 
     authController = testHelper.app.get<AuthController>(AuthController);
