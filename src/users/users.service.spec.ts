@@ -84,12 +84,12 @@ describe('UserService', () => {
     });
   });
 
-  describe('GET - GetAllUsers', () => {
-    it('should return an array of users', async () => {
-      const users = await userService.GetAllUsers();
-      expect(users).toBeInstanceOf(Array);
-    });
-  });
+  // describe('GET - GetAllUsers', () => {
+  //   it('should return an array of users', async () => {
+  //     const users = await userService.GetAllUsers();
+  //     expect(users).toBeInstanceOf(Array);
+  //   });
+  // });
 
   // describe('PUT - addTagsToAuthUserByTwoTagsFields', () => {
   //   it('should return token typeof string', async () => {

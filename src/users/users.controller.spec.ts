@@ -146,12 +146,12 @@ describe('UserController', () => {
   //   expect(userController).toBeDefined();
   // });
 //---------------------------------------------------------
-  describe('GetAllUsers', () => {
-    it('should return an array of users', async () => {
-      const users = await userController.GetAllUsers();
-      expect(users).toBeInstanceOf(Array);
-    });
-  });
+//   describe('GetAllUsers', () => {
+//     it('should return an array of users', async () => {
+//       const users = await userController.GetAllUsers();
+//       expect(users).toBeInstanceOf(Array);
+//     });
+//   });
 
   describe('GetAllUsers1', () => {
     it('should return an array of users', async () => {
