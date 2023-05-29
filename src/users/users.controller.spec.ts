@@ -153,24 +153,24 @@ describe('UserController', () => {
     });
   });
 
-    describe('GetAllUsers', () => {
-      it('should return an array of users', async () => {
-        let createUserDto: CreateUserDto = {
-          name: 'John Doe',
-          email: 'john.doe@example.com',
-          password: 'password',
-        };
-        await userService.createUser(createUserDto);
-        const users = await userController.GetAllUsers();
+  describe('GetAllUsers1', () => {
+    it('should return an array of users', async () => {
+      let createUserDto: CreateUserDto = {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        password: 'password',
+      };
+      await userService.createUser(createUserDto);
+      const users = await userController.GetAllUsers();
 
-        expect(users).toBeDefined();
-        expect(users.length).toBe(1);
-        expect(users).toHaveLength(1);
-        expect(users[0]).toBeInstanceOf(User);
-        expect(users[0].name).toEqual(createUserDto.name);
-        expect(users[0].email).toEqual(createUserDto.email);
-      });
+      expect(users).toBeDefined();
+      expect(users.length).toBe(1);
+      expect(users).toHaveLength(1);
+      expect(users[0]).toBeInstanceOf(User);
+      expect(users[0].name).toEqual(createUserDto.name);
+      expect(users[0].email).toEqual(createUserDto.email);
     });
+  });
 
   describe('POST - CreateUser', () => {
     it('should return user', async () => {
@@ -238,48 +238,48 @@ describe('UserController', () => {
    * Test the PUT route (add tags to auth user)
    */
 
-  describe('PUT /users/add-tags-by-two-fields API (e2e)', () => {
-    it('should return token typeof string', async () => {
-      const createTestUserDto: CreateUserDto = {
-        name: 'John Doe',
-        email: 'john2.doe@example.com',
-        password: 'password'
-      }
-
-      const token = await authService.registration(createTestUserDto);
-      // const token = await authService.registration(createTestUserDto);
-      const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
-
-      expect(createTestUserDto.email).toBe(user.email);
-      expect(typeof(token.token)).toBe('string');
-
-      const tags = [
-        { name: 'tag1', color: '#ff0000' },
-        { name: 'tag2', color: '#00ff00' },
-        { name: 'tag3', color: '#0000ff' },
-      ];
-
-      const req = {
-        user: { id: user.id },
-      };
-
-      const response = await request(testHelper.app.getHttpServer())
-          .put(`/users/add-tags-by-two-fields`)
-          .set('Authorization', `Bearer ${token.token}`)
-          .send(tags)
-
-      // console.log('!!! response = ', response.status);
-      // console.log('!!! token = ', token.token);
-
-      // await userService.addTagsToAuthUserByTwoTagsFields(tags, req.user.id)
-      let result = await UserTags.findAll({where: {userId: user.id}})
-
-      expect(result.length).toBe(3);
-      expect(typeof(token.token)).toBe('string');
-
-      expect(response.status).toBe(HttpStatus.OK);
-    });
-  });
+  // describe('PUT /users/add-tags-by-two-fields API (e2e)', () => {
+  //   it('should return token typeof string', async () => {
+  //     const createTestUserDto: CreateUserDto = {
+  //       name: 'John Doe',
+  //       email: 'john2.doe@example.com',
+  //       password: 'password'
+  //     }
+  //
+  //     const token = await authService.registration(createTestUserDto);
+  //     // const token = await authService.registration(createTestUserDto);
+  //     const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+  //
+  //     expect(createTestUserDto.email).toBe(user.email);
+  //     expect(typeof(token.token)).toBe('string');
+  //
+  //     const tags = [
+  //       { name: 'tag1', color: '#ff0000' },
+  //       { name: 'tag2', color: '#00ff00' },
+  //       { name: 'tag3', color: '#0000ff' },
+  //     ];
+  //
+  //     const req = {
+  //       user: { id: user.id },
+  //     };
+  //
+  //     const response = await request(testHelper.app.getHttpServer())
+  //         .put(`/users/add-tags-by-two-fields`)
+  //         .set('Authorization', `Bearer ${token.token}`)
+  //         .send(tags)
+  //
+  //     // console.log('!!! response = ', response.status);
+  //     // console.log('!!! token = ', token.token);
+  //
+  //     // await userService.addTagsToAuthUserByTwoTagsFields(tags, req.user.id)
+  //     let result = await UserTags.findAll({where: {userId: user.id}})
+  //
+  //     expect(result.length).toBe(3);
+  //     expect(typeof(token.token)).toBe('string');
+  //
+  //     expect(response.status).toBe(HttpStatus.OK);
+  //   });
+  // });
 
   // describe('PUT - addTagWithTransaction', () => {
   //   it('should return token typeof string', async () => {

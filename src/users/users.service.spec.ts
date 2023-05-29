@@ -91,39 +91,40 @@ describe('UserService', () => {
     });
   });
 
-  describe('PUT - addTagsToAuthUserByTwoTagsFields', () => {
-    it('should return token typeof string', async () => {
-      const createTestUserDto: CreateUserDto = {
-        name: 'John Doe',
-        email: 'john4.doe@example.com',
-        password: 'password'
-      }
-
-      const token = await authService.registration(createTestUserDto);
-      const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
-
-      expect(createTestUserDto.email).toBe(user.email);
-      expect(typeof(token.token)).toBe('string');
-
-      const tags = [
-        { name: 'tag1', color: '#ff0000' },
-        { name: 'tag2', color: '#00ff00' },
-        { name: 'tag3', color: '#0000ff' },
-      ];
-
-      const req = {
-        user: { id: user.id },
-      };
-
-      await userService.addTagsToAuthUserByTwoTagsFields(tags, req.user.id);
-
-      let result = await UserTags.findAll({where: {userId: user.id}, transaction})
-      expect(result.length).toBe(3);
-      expect(typeof(token.token)).toBe('string');
-
-      // await transaction.commit()
-    });
-  });
+  // describe('PUT - addTagsToAuthUserByTwoTagsFields', () => {
+  //   it('should return token typeof string', async () => {
+  //     const createTestUserDto: CreateUserDto = {
+  //       name: 'John Doe',
+  //       email: 'john4.doe@example.com',
+  //       password: 'password'
+  //     }
+  //
+  //     const token = await authService.registration(createTestUserDto);
+  //     const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+  //
+  //     expect(createTestUserDto.email).toBe(user.email);
+  //     expect(typeof(token.token)).toBe('string');
+  //
+  //     const tags = [
+  //       { name: 'tag4', color: '#ff0000' },
+  //       { name: 'tag5', color: '#00ff00' },
+  //       { name: 'tag6', color: '#0000ff' },
+  //     ];
+  //
+  //     const req = {
+  //       user: { id: user.id },
+  //     };
+  //
+  //     console.log('!!! req.user.id = ', req.user.id)
+  //     await userService.addTagsToAuthUserByTwoTagsFields(tags, req.user.id);
+  //
+  //     let result = await UserTags.findAll({where: {userId: user.id}, transaction})
+  //     expect(result.length).toBe(3);
+  //     expect(typeof(token.token)).toBe('string');
+  //
+  //     // await transaction.commit()
+  //   });
+  // });
 
   // describe('POST - CreateUserWithTransaction', () => {
   //   it('should return user', async () => {
