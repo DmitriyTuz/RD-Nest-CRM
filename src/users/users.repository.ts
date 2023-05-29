@@ -29,7 +29,7 @@ export class UserRepository {
     }
 
     async findByPk(id) {
-        const user = await this.userModel.findByPk(id);
+        const user = await this.userModel.findByPk(id, {include: {all: true}});
         return user;
     }
 

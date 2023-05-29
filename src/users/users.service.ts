@@ -1,16 +1,12 @@
-import {HttpException, HttpStatus, Injectable, Request} from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/sequelize";
-import {User} from "./users.model";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {AddTagDto} from "./dto/add-tag.dto";
 import {TagsService} from "../tags/tags.service";
 import {Tag} from "../tags/tags.model";
-import {Op, Transaction} from 'sequelize';
+import {Transaction} from 'sequelize';
 import {UserRepository} from "./users.repository";
 import {UserTags} from "../tags/user-tags.model";
-import {TagRepository} from "../tags/tags.repository";
-import {Sequelize} from "sequelize-typescript";
-import sequelizeConfig from "../../config/sequelize.config";
 
 @Injectable()
 export class UsersService {
@@ -33,24 +29,20 @@ export class UsersService {
     }
 
     async GetAllUsers() {
-        const users = await this.userRepository.findAll();
-        return users;
+        return await this.userRepository.findAll();
     }
 
     async GetAllUsersWithTransaction(transaction?: Transaction) {
-        const users = await this.userRepository.GetAllUsersWithTransaction(transaction);
-        return users;
+        return await this.userRepository.GetAllUsersWithTransaction(transaction);
     }
 
     async getUserById(id) {
-        const user = this.userRepository.getUserById(id);
-        return user;
+        return this.userRepository.getUserById(id);
     }
 
     async createUser(dto: CreateUserDto) {
         try {
-            const user = await this.userRepository.createUser(dto);
-            return user;
+            return await this.userRepository.createUser(dto);
         } catch (e) {
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
@@ -58,8 +50,7 @@ export class UsersService {
 
     async createUserTest(dto: CreateUserDto) {
         try {
-            const user = await this.userRepository.createUserTest(dto);
-            return user;
+            return await this.userRepository.createUserTest(dto);
         } catch (e) {
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
@@ -67,26 +58,22 @@ export class UsersService {
 
     async createUserWithTransaction(dto: CreateUserDto, transaction?: Transaction) {
         try {
-            const user = await this.userRepository.createUserWithTransaction(dto, transaction);
-            return user;
+            return await this.userRepository.createUserWithTransaction(dto, transaction);
         } catch (e) {
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
     }
 
     async getUserByEmail(email: string) {
-        const user = await this.userRepository.getUserByEmail(email);
-        return user;
+        return await this.userRepository.getUserByEmail(email);
     }
 
     async deleteUserById(id) {
-        const user = await this.userRepository.deleteUserById(id);
-        return user;
+        return await this.userRepository.deleteUserById(id);
     }
 
     async deleteUserByEmail(email: string) {
-        const user = await this.userRepository.deleteUserByEmail(email);
-        return user;
+        return await this.userRepository.deleteUserByEmail(email);
     }
 
     async addTagToUser(dto: AddTagDto, req) {
@@ -145,6 +132,60 @@ export class UsersService {
             });
 
             await this.userTagRepository.bulkCreate(currentUserTagEntities);
+
+        } catch (e) {
+            console.log('!!! ERROR in addTags - ', e);
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    async addTagsToAuthUserByTwoTagsFieldsWithNoBulk(tags: { name: string, color: string }[], currentUserId): Promise<void> {
+
+        try {
+
+            const arrayFoundsTags: Tag[] = await this.tagService.findTagsByArrayOfNameAndColor(tags)
+
+            const arrayNotFoundsTags: any = tags.filter(item1 => !arrayFoundsTags.some(item2 => item1.name === item2.name && item1.color === item2.color));
+
+            const arrayForBulkCreate = arrayNotFoundsTags.map((tag) => {
+                const tagEq = {name: '', color: '', ownerId: 0}
+                tagEq.ownerId = currentUserId;
+                tagEq.name = tag.name;
+                tagEq.color = tag.color;
+                return tagEq;
+            });
+
+            await this.tagService.bulkCreateTags(arrayForBulkCreate);
+
+            const arrayFoundsTagsAfterCreate: Tag[] = await this.tagService.findTagsByArrayOfNameAndColor(tags)
+
+            await this.userTagRepository.destroy({
+                where: {
+                    userId: currentUserId,
+                },
+            });
+
+            const user = await this.userRepository.findByPk(currentUserId);
+            console.log('user = ', user)
+
+            for (let tag of arrayFoundsTagsAfterCreate) {
+                await user.$add("tag", tag.id);
+            }
+
+            // const currentUserTagEntities = arrayFoundsTagsAfterCreate.map((tag) => {
+            //     const userTag = {userId: 0, tagId: 0}
+            //     userTag.userId = currentUserId;
+            //     userTag.tagId = tag.id;
+            //     return userTag;
+            // });
+            //
+            // console.log('user = ', user);
+            // console.log('currentUserTagEntities = ', currentUserTagEntities);
+            // console.log('currentUserId = ', currentUserId);
+            //
+            //
+            // await this.userTagRepository.bulkCreate(currentUserTagEntities);
 
         } catch (e) {
             console.log('!!! ERROR in addTags - ', e);
