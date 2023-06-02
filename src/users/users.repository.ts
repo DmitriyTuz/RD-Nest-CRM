@@ -1,9 +1,8 @@
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { User } from './users.model';
+import {Injectable} from '@nestjs/common';
+import {InjectModel} from '@nestjs/sequelize';
+import {User} from './users.model';
 import {CreateUserDto} from "./dto/create-user.dto";
-import {AddTagDto} from "./dto/add-tag.dto";
-import sequelize, {Transaction} from "sequelize";
+import {Transaction} from "sequelize";
 import {Sequelize} from "sequelize-typescript";
 import sequelizeConfig from "../../config/sequelize.config";
 
@@ -16,7 +15,7 @@ export class UserRepository {
     ) {}
 
     async findAll(): Promise<User[]> {
-        return this.userModel.findAll();
+        return await this.userModel.findAll();
     }
 
     async GetAllUsersWithTransaction(transaction?: Transaction) {
@@ -34,16 +33,7 @@ export class UserRepository {
     }
 
     async createUser(dto: CreateUserDto) {
-        const user = await this.userModel.create(dto);
-        return user;
-    }
-
-    async createUserTest(dto: CreateUserDto) {
-        const sequelize = new Sequelize(sequelizeConfig);
-        const transaction = await sequelize.transaction()
-        const user = await this.userModel.create(dto, {transaction});
-        await transaction.rollback();
-        return user;
+        return await this.userModel.create(dto);
     }
 
     async createUserWithTransaction(dto: CreateUserDto, transaction?: Transaction) {
