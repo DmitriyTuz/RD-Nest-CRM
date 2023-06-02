@@ -34,16 +34,16 @@ export class UsersController {
         }
     }
 
-    // @Get('find-by-tags')
-    // @UseGuards(JwtAuthGuard)
-    // async getUsersByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
-    //     try {
-    //         const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
-    //         return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
-    //     } catch (e) {
-    //         console.log('!!! err = ', e)
-    //     }
-    // }
+    @Get('find-by-tags')
+    @UseGuards(JwtAuthGuard)
+    async getUsersByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
+        try {
+            const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
+            return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
+        } catch (e) {
+            console.log('!!! err = ', e)
+        }
+    }
 
     // @ApiOperation({ summary: "Getting user by id" })
     // @ApiResponse({ status: 200, type: User })
@@ -60,8 +60,8 @@ export class UsersController {
     @ApiResponse({ status: 200, type: User })
     @UsePipes(ValidationPipe)
     @Post('create-user')
-    createUser(@Body() userDto: CreateUserDto) {
-        return this.usersService.createUser(userDto);
+    async createUser(@Body() userDto: CreateUserDto) {
+        return await this.usersService.createUser(userDto);
     }
 
     @ApiOperation({ summary: "User creation" })
@@ -75,30 +75,20 @@ export class UsersController {
         return this.usersService.createUserWithTransaction(userDto, transaction);
     }
 
-    @ApiOperation({ summary: "User creation" })
-    @ApiResponse({ status: 200, type: User })
-    @UsePipes(ValidationPipe)
-    // @UseGuards(JwtAuthGuard)
-    @Post('create-user-with-transaction-test')
-    async createUserTest(@Body() userDto: CreateUserDto) {
-        return this.usersService.createUserTest(userDto);
-    }
-
     @Put('add-tag')
     @UseGuards(JwtAuthGuard)
     addTagToUser(@Body() dto: AddTagDto, @Request() req) {
         return this.usersService.addTagToUser(dto, req);
     }
 
-    @Put('add-tags-by-two-fields')
+    @Put('add-tags-by-array-of-two-fields')
     @UseGuards(JwtAuthGuard)
     addTagToAuthUserByTwoTagsFields(@Body() dto: AddTagDto[], @Request() req) {
         return this.usersService.addTagsToAuthUserByTwoTagsFields(dto, req.user.id);
     }
 
-    @Put('add-tags-by-array-of-two-fields')
+    @Put('add-tags-by-array-of-two-fields-with-transaction')
     @UseGuards(JwtAuthGuard)
-
     addTagToAuthUserByTwoTagsFieldsWithTransaction(@Body() dto: AddTagDto[], @Request() req, transaction?: Transaction) {
         // if (req.transaction) { transaction = req.transaction }
         // console.log('!!! transaction2.id = ', transaction['id'])

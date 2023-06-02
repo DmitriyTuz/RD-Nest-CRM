@@ -24,7 +24,7 @@ export class User extends Model<User, UserCreationAttrs> {
         unique: true,
         autoIncrement: true,
         primaryKey: true,
-        onDelete: 'CASCADE'
+        // onDelete: 'CASCADE'
     })
     id: number;
 
@@ -32,7 +32,7 @@ export class User extends Model<User, UserCreationAttrs> {
     @Column({
         type: DataType.STRING,
         allowNull: false,
-        onDelete: 'CASCADE'
+        // onDelete: 'CASCADE'
     })
     name: string;
 
@@ -41,7 +41,7 @@ export class User extends Model<User, UserCreationAttrs> {
         type: DataType.STRING,
         unique: true,
         allowNull: false,
-        onDelete: 'CASCADE'
+        // onDelete: 'CASCADE'
     })
     email: string;
 
@@ -49,10 +49,11 @@ export class User extends Model<User, UserCreationAttrs> {
     @Column({
         type: DataType.STRING,
         allowNull: false,
-        onDelete: 'CASCADE'
+        // onDelete: 'CASCADE'
     })
     password: string;
 
     @BelongsToMany(() => Tag, () => UserTags)
     tags: Tag[];
 }
+

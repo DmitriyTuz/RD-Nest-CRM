@@ -4,9 +4,10 @@ import {CreateUserDto} from "./dto/create-user.dto";
 import {AddTagDto} from "./dto/add-tag.dto";
 import {TagsService} from "../tags/tags.service";
 import {Tag} from "../tags/tags.model";
-import {Transaction} from 'sequelize';
+import {Op, Transaction} from 'sequelize';
 import {UserRepository} from "./users.repository";
 import {UserTags} from "../tags/user-tags.model";
+import {User} from "./users.model";
 
 @Injectable()
 export class UsersService {
@@ -43,14 +44,6 @@ export class UsersService {
     async createUser(dto: CreateUserDto) {
         try {
             return await this.userRepository.createUser(dto);
-        } catch (e) {
-            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    async createUserTest(dto: CreateUserDto) {
-        try {
-            return await this.userRepository.createUserTest(dto);
         } catch (e) {
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
@@ -173,20 +166,6 @@ export class UsersService {
                 await user.$add("tag", tag.id);
             }
 
-            // const currentUserTagEntities = arrayFoundsTagsAfterCreate.map((tag) => {
-            //     const userTag = {userId: 0, tagId: 0}
-            //     userTag.userId = currentUserId;
-            //     userTag.tagId = tag.id;
-            //     return userTag;
-            // });
-            //
-            // console.log('user = ', user);
-            // console.log('currentUserTagEntities = ', currentUserTagEntities);
-            // console.log('currentUserId = ', currentUserId);
-            //
-            //
-            // await this.userTagRepository.bulkCreate(currentUserTagEntities);
-
         } catch (e) {
             console.log('!!! ERROR in addTags - ', e);
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
@@ -256,21 +235,66 @@ export class UsersService {
 
     }
 
-    // async getUsersByTagIds(tagIds: number[], userId): Promise<User[]> {
-    //     return this.userRepository.findAll({
-    //         where: {
-    //             id: {[Op.not]: userId},
-    //         },
-    //         include: [
-    //             {
-    //                 model: Tag,
-    //                 where: {
-    //                     id: tagIds
-    //                 }
-    //             }
-    //         ]
-    //     });
-    // }
+    async getUsersByTagIds(tagIds: number[], userId): Promise<User[]> {
+        return User.findAll({
+            where: {
+                id: {[Op.not]: userId},
+            },
+            include: [
+                {
+                    model: Tag,
+                    where: {
+                        id: tagIds
+                    }
+                }
+            ]
+        });
+    }
+
+    async addTagsToAuthUserByTwoTagsFieldsTest(tags: { name: string, color: string }[], currentUserId): Promise<void> {
+
+        try {
+
+            const arrayFoundsTags: Tag[] = await this.tagService.findTagsByArrayOfNameAndColor(tags)
+
+            const arrayNotFoundsTags: any = tags.filter(item1 => !arrayFoundsTags.some(item2 => item1.name === item2.name && item1.color === item2.color));
+
+            const arrayForBulkCreate = arrayNotFoundsTags.map((tag) => {
+                const tagEq = {name: '', color: '', ownerId: 0}
+                tagEq.ownerId = currentUserId;
+                tagEq.name = tag.name;
+                tagEq.color = tag.color;
+                return tagEq;
+            });
+
+            await this.tagService.bulkCreateTags(arrayForBulkCreate);
+
+            // const arrayFoundsTagsAfterCreate: Tag[] = await this.tagService.findTagsByArrayOfNameAndColor(tags)
+
+            const user = await User.findByPk(currentUserId, { include: [Tag] });
+            if (!user) {
+                // Обработка случая, если пользователь не найден
+                throw new HttpException(`User not found`, HttpStatus.NOT_FOUND)
+                // throw new NotFoundException('User not found');
+            }
+
+            const existingTags = user.tags || [];
+            const existingTagNames = existingTags.map(tag => tag.name);
+            const existingTagColors = existingTags.map(tag => tag.color);
+
+            const newTags = tags.filter(tag => {
+                return !existingTagNames.includes(tag.name) || !existingTagColors.includes(tag.color);
+            });
+
+            const arrayTagsForAdd: Tag[] = await this.tagService.findTagsByArrayOfNameAndColor(newTags)
+            await user.$add('tags', arrayTagsForAdd);
+
+        } catch (e) {
+            console.log('!!! ERROR in addTags - ', e);
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+        }
+
+    }
 }
 
 
