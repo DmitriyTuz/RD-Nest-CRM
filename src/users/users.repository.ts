@@ -18,10 +18,6 @@ export class UserRepository {
         return await this.userModel.findAll();
     }
 
-    async GetAllUsersWithTransaction(transaction?: Transaction) {
-        const options = transaction ? { transaction } : {};
-        return this.userModel.findAll(options);
-    }
 
     async getUserById(id) {
         return await this.userModel.findOne({where: { id }});
@@ -34,13 +30,6 @@ export class UserRepository {
 
     async createUser(dto: CreateUserDto) {
         return await this.userModel.create(dto);
-    }
-
-    async createUserWithTransaction(dto: CreateUserDto, transaction?: Transaction) {
-        console.log('!!! transaction3.id = ', transaction['id'])
-        const options = transaction ? { transaction } : {};
-        const user = await this.userModel.create(dto, options);
-        return user;
     }
 
     async getUserByEmail(email: string) {

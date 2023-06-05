@@ -153,7 +153,7 @@ describe('UserController', () => {
    * Test the PUT route (add tags to auth user)
    */
 
-  describe('PUT /users/add-tags-by-two-fields API (e2e)', () => {
+  describe('PUT /users/add-tags-to-user API (e2e)', () => {
     it('should return token typeof string', async () => {
       const createTestUserDto: CreateUserDto = {
         name: 'John Doe',
@@ -179,7 +179,7 @@ describe('UserController', () => {
       };
 
       const response = await request(testHelper.app.getHttpServer())
-          .put(`/users/add-tags-by-two-fields`)
+          .put(`/users/add-tags-to-user`)
           .set('Authorization', `Bearer ${token.token}`)
           .send(tags)
 

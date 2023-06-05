@@ -4,7 +4,6 @@ import { CreateUserDto } from "../users/dto/create-user.dto";
 import { AuthService } from "./auth.service";
 import {JwtAuthGuard} from "./jwt-auth.guard";
 import {ValidationPipe} from "../validation.pipe";
-import {Transaction} from "sequelize";
 
 @ApiTags("Authorization")
 @Controller("auth")

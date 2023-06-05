@@ -127,7 +127,7 @@ describe('UserService', () => {
       };
 
       console.log('!!! req.user.id = ', req.user.id)
-      await userService.addTagsToAuthUserByTwoTagsFields(tags, req.user.id);
+      await userService.addTagsToUser(tags, req.user.id);
 
       let result = await UserTags.findAll({where: {userId: user.id}, transaction})
       expect(result.length).toBe(3);
