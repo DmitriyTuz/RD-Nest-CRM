@@ -9,7 +9,6 @@ import { UsersService } from "../users/users.service";
 import * as bcrypt from "bcryptjs";
 import { User } from "../users/users.model";
 import { JwtService } from "@nestjs/jwt";
-import {Transaction} from "sequelize";
 
 @Injectable()
 export class AuthService {
@@ -41,26 +40,6 @@ export class AuthService {
         ...userDto,
         password: hashPassword,
       });
-      return this.generateToken(user);
-    } catch (e) {
-      throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async registrationWithTransaction(userDto: CreateUserDto, transaction?: Transaction) {
-    try {
-      const candidate = await this.userService.getUserByEmail(userDto.email);
-      if (candidate) {
-        throw new HttpException(
-            "user with this email already exists",
-            HttpStatus.BAD_REQUEST
-        );
-      }
-      const hashPassword = await bcrypt.hash(userDto.password, 5);
-      const user = await this.userService.createUserWithTransaction({
-        ...userDto,
-        password: hashPassword,
-      }, transaction);
       return this.generateToken(user);
     } catch (e) {
       throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);

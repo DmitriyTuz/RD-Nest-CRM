@@ -7,11 +7,8 @@ import { TagsModule } from './tags/tags.module';
 import {Tag} from "./tags/tags.model";
 import {UserTags} from "./tags/user-tags.model";
 import {AuthModule} from "./auth/auth.module";
-import {JwtModule, JwtService} from "@nestjs/jwt";
-import {UsersController} from "./users/users.controller";
-import {UsersService} from "./users/users.service";
-import {Transaction} from "sequelize";
-import {UserRepository} from "./users/users.repository";
+import {JwtModule} from "@nestjs/jwt";
+
 
 @Module({
     controllers: [],
