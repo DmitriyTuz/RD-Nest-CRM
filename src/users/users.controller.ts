@@ -12,7 +12,7 @@ import {UsersService} from "./users.service";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {AddTagDto} from "./dto/add-tag.dto";
+import {TagDto} from "./dto/add-tag.dto";
 // import {ValidationPipe} from "../validation.pipe";
 import {Transaction} from "sequelize";
 // import {AddTagsDto} from "./dto/add-tags.dto";
@@ -35,15 +35,31 @@ export class UsersController {
         }
     }
 
-    @Get('find-by-tags')
-    @UseGuards(JwtAuthGuard)
-    async getUsersByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
-        try {
-            const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
-            return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
-        } catch (e) {
-            console.log('!!! err = ', e)
-        }
+    // @Get('find-user-by-tags')
+    // @UseGuards(JwtAuthGuard)
+    // async getUsersByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
+    //     try {
+    //         const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
+    //         return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
+    //     } catch (e) {
+    //         console.log('!!! err = ', e)
+    //     }
+    // }
+
+    // @Get('find-user-by-tags-test')
+    // @UseGuards(JwtAuthGuard)
+    // async getUsersByTags(@Query('tags') tagIds: string, @Request() req): Promise<User[]> {
+    //     try {
+    //         const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
+    //         return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
+    //     } catch (e) {
+    //         console.log('!!! err = ', e)
+    //     }
+    // }
+
+    @Get('search-user-by-tags-test')
+    async searchUsersByTags(@Body() tags: TagDto[]): Promise<User[]> {
+        return await this.usersService.searchUsersByTags(tags);
     }
 
     @ApiOperation({ summary: "Getting user by id" })
@@ -63,14 +79,14 @@ export class UsersController {
 
     @Put('add-tag-to-user')
     @UseGuards(JwtAuthGuard)
-    addTagToUser(@Body() dto: AddTagDto, @Request() req) {
+    addTagToUser(@Body() dto: TagDto, @Request() req) {
         return this.usersService.addTagToUser(dto, req);
     }
 
     @Put('add-tags-to-user')
     @UsePipes(ValidationPipe)
     @UseGuards(JwtAuthGuard)
-    addTagToAuthUserByTwoTagsFields(@Body() dto: AddTagDto[], @Request() req) {
+    addTagToAuthUserByTwoTagsFields(@Body() dto: TagDto[], @Request() req) {
         return this.usersService.addTagsToUser(dto, req.user.id);
     }
 

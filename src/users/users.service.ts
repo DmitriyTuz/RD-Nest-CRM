@@ -1,10 +1,10 @@
 import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/sequelize";
 import {CreateUserDto} from "./dto/create-user.dto";
-import {AddTagDto} from "./dto/add-tag.dto";
+import {TagDto} from "./dto/add-tag.dto";
 import {TagsService} from "../tags/tags.service";
 import {Tag} from "../tags/tags.model";
-import {Op} from 'sequelize';
+import {Op, Sequelize} from 'sequelize';
 import {UserRepository} from "./users.repository";
 import {UserTags} from "../tags/user-tags.model";
 import {User} from "./users.model";
@@ -47,7 +47,7 @@ export class UsersService {
         return await this.userRepository.deleteUserByEmail(email);
     }
 
-    async addTagToUser(dto: AddTagDto, req) {
+    async addTagToUser(dto: TagDto, req) {
 
         try {
             const user = await this.userRepository.findByPk(req.user.id);
@@ -69,7 +69,7 @@ export class UsersService {
         }
     }
 
-    async addTagsToUser(dto: AddTagDto[], currentUserId): Promise<void> {
+    async addTagsToUser(dto: TagDto[], currentUserId): Promise<void> {
         try {
             const user = await this.userRepository.findByPk(currentUserId);
             if (!user) {
@@ -133,6 +133,181 @@ export class UsersService {
                 }
             ]
         });
+    }
+
+    // async searchUsersByTags(tags: TagDto[]): Promise<User[]> {
+    //
+    //     try {
+    //         const users = await User.findAll({
+    //             attributes: ['id', 'name', 'email', 'createdAt', 'updatedAt'],
+    //             include: [
+    //                 {
+    //                     model: Tag,
+    //                     as: 'tags',
+    //                     // through: { attributes: [] },
+    //                     where: {
+    //                         [Op.and]: tags.map((tag) => ({
+    //                             name: tag.name,
+    //                             color: tag.color,
+    //                         })),
+    //                     },
+    //                     through: { attributes: [] }
+    //                 },
+    //             ],
+    //             group: ['User.id', 'User.name', 'User.email', 'User.createdAt', 'User.updatedAt'], // Группируем по идентификатору пользователя
+    //             having: Sequelize.literal(`COUNT(DISTINCT tags.id) = ${tags.length}`)
+    //         });
+    //
+    //         return users;
+    //     } catch (e) {
+    //         console.log('!!! ERROR in searchUsersByTags - ', e);
+    //         throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+    //     }
+    //
+    // }
+
+    // async searchUsersByTags(tags: TagDto[]): Promise<User[]> {
+    //     try {
+    //         const users = await User.findAll({
+    //             include: [
+    //                 {
+    //                     model: Tag,
+    //                     as: 'tags',
+    //                     where: {
+    //                         [Op.and]: tags.map((tag) => ({
+    //                             name: tag.name,
+    //                             color: tag.color,
+    //                         })),
+    //                     },
+    //                     through: { attributes: [] }, // Используйте эту опцию, чтобы исключить атрибуты связи (UserTags)
+    //                 },
+    //             ],
+    //             group: ['User.id', 'tags.id'], // Добавьте группировку по id пользователей и id тегов
+    //             having: Sequelize.literal(`COUNT(DISTINCT tags.id) = ${tags.length}`), // Используйте "tags.id" для агрегатной функции
+    //         });
+    //
+    //         return users;
+    //     } catch (e) {
+    //         console.log('!!! ERROR in searchUsersByTags - ', e);
+    //         throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
+
+    // async searchUsersByTags(tags: TagDto[]): Promise<User[]> {
+    //     try {
+    //         const users = await User.findAll({
+    //             include: [
+    //                 {
+    //                     model: Tag,
+    //                     as: 'tags',
+    //                     where: {
+    //                         [Op.or]: tags.map((tag) => ({
+    //                             [Op.and]: [{ name: tag.name }, { color: tag.color }],
+    //                         })),
+    //                     },
+    //                     through: { attributes: [] },
+    //                 },
+    //             ],
+    //             group: ['User.id', 'tags.id'],
+    //             having: Sequelize.literal(`COUNT(DISTINCT tags.id) = ${tags.length}`),
+    //         });
+    //
+    //         return users;
+    //     } catch (e) {
+    //         console.log('!!! ERROR in searchUsersByTags - ', e);
+    //         throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
+
+    // async searchUsersByTags(tags: TagDto[]): Promise<User[]> {
+    //     try {
+    //         const tagIds = await Tag.findAll({
+    //             where: {
+    //                 [Op.and]: tags.map((tag) => ({
+    //                     name: tag.name,
+    //                     color: tag.color,
+    //                 })),
+    //             },
+    //             attributes: ['id'], // Получаем только идентификаторы тегов
+    //         });
+    //
+    //         const tagIdsArray = tagIds.map((tag) => tag.id);
+    //
+    //         const users = await User.findAll({
+    //             include: [
+    //                 {
+    //                     model: Tag,
+    //                     as: 'tags',
+    //                     where: {
+    //                         id: {
+    //                             [Op.in]: tagIdsArray, // Ищем пользователей, у которых есть все найденные теги
+    //                         },
+    //                     },
+    //                     through: { attributes: [] },
+    //                 },
+    //             ],
+    //             group: ['User.id', 'tags.id'], // Группируем только по идентификатору пользователя
+    //             having: Sequelize.literal(`COUNT(DISTINCT tags.id) = ${tags.length}`),
+    //         });
+    //
+    //         return users;
+    //     } catch (e) {
+    //         console.log('!!! ERROR in searchUsersByTags - ', e);
+    //         throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
+
+    async searchUsersByTags(tags: TagDto[]): Promise<User[]> {
+        try {
+
+            const tagConditions = tags.map((tag) => ({
+                [Op.and]: [
+                    { name: tag.name },
+                    { color: tag.color },
+                ],
+            }));
+
+            const tagIds = await Tag.findAll({
+                where: {
+                    [Op.or]: tagConditions,
+                },
+                attributes: ['id'], // Получаем только идентификаторы тегов
+            });
+
+            const tagIdsArray = tagIds.map((tag) => tag.id);
+
+            const users = await User.findAll({
+                where: {
+                    id: {
+                        [Op.in]: Sequelize.literal(`(
+                            SELECT "userId" FROM "user_tags" WHERE "tagId" IN (${tagIdsArray.join(',')})
+                            GROUP BY "userId"
+                            HAVING COUNT(DISTINCT "tagId") = ${tagIdsArray.length}
+                        )`),
+                    },
+                },
+
+                include: [
+                    {
+                        model: Tag,
+                        as: 'tags',
+                        where: {
+                            id: {
+                                [Op.in]: tagIdsArray, // Ищем пользователей, у которых есть все найденные теги
+                            },
+                        },
+                        through: { attributes: [] },
+                    },
+                ],
+                // group: ['User.id', 'user_tags'], // Группируем только по идентификатору пользователя
+                // having: Sequelize.literal(`COUNT(DISTINCT tags.id) = ${tags.length}`),
+            });
+
+            return users;
+        } catch (e) {
+            console.log('!!! ERROR in searchUsersByTags - ', e);
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
