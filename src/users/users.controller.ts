@@ -35,16 +35,16 @@ export class UsersController {
         }
     }
 
-    // @Get('find-user-by-tags')
-    // @UseGuards(JwtAuthGuard)
-    // async getUsersByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
-    //     try {
-    //         const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
-    //         return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
-    //     } catch (e) {
-    //         console.log('!!! err = ', e)
-    //     }
-    // }
+    @Get('find-user-by-tags')
+    @UseGuards(JwtAuthGuard)
+    async getUsersByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
+        try {
+            const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
+            return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
+        } catch (e) {
+            console.log('!!! err = ', e)
+        }
+    }
 
     // @Get('find-user-by-tags-test')
     // @UseGuards(JwtAuthGuard)
@@ -58,8 +58,9 @@ export class UsersController {
     // }
 
     @Get('search-user-by-tags-test')
-    async searchUsersByTags(@Body() tags: TagDto[]): Promise<User[]> {
-        return await this.usersService.searchUsersByTags(tags);
+    @UseGuards(JwtAuthGuard)
+    async searchUsersByTags(@Body() tags: TagDto[], @Request() req): Promise<User[]> {
+        return await this.usersService.searchUsersByTags(tags, req.user.id);
     }
 
     @ApiOperation({ summary: "Getting user by id" })
