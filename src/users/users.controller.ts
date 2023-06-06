@@ -57,10 +57,19 @@ export class UsersController {
     //     }
     // }
 
-    @Get('search-user-by-tags-test')
+
+// use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
+    @Get('search-users-by-tags')
     @UseGuards(JwtAuthGuard)
-    async searchUsersByTags(@Body() tags: TagDto[], @Request() req): Promise<User[]> {
+    async searchUsersByTags(@Query('tags') tags: TagDto[], @Request() req): Promise<User[]> {
         return await this.usersService.searchUsersByTags(tags, req.user.id);
+    }
+
+// use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
+    @Get('filter-users-by-tags')
+    @UseGuards(JwtAuthGuard)
+    async filterUsersByTags(@Query('tags') tags: TagDto[], @Request() req): Promise<User[]> {
+        return await this.usersService.filterUsersByTags(tags, req.user.id);
     }
 
     @ApiOperation({ summary: "Getting user by id" })
