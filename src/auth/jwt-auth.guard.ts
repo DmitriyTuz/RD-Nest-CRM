@@ -6,15 +6,10 @@ import {
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { JwtService } from "@nestjs/jwt";
-import sequelize, {Transaction} from "sequelize";
-import {UsersService} from "../users/users.service";
-import {Sequelize} from "sequelize-typescript";
-import sequelizeConfig from "../../config/sequelize.config";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService,
-              private userService: UsersService) {}
+  constructor(private jwtService: JwtService) {}
 
   canActivate(
     context: ExecutionContext
@@ -31,17 +26,6 @@ export class JwtAuthGuard implements CanActivate {
 
       const user = this.jwtService.verify(token, { secret: process.env.PRIVATE_KEY });
 
-      // const { id, options } = JSON.parse(request.headers['transaction']);
-      // const { options } = JSON.parse(request.header('Transaction'));
-      // console.log('!!! options = ', options);
-      // console.log('!!! id = ', id);
-      // let sequelize = new Sequelize(sequelizeConfig)
-      // const transaction = sequelize.transaction(options)
-      //     console.log('!!! HeaderTransaction = ', transaction);
-
-      // if (request.header('transaction')) { request.transaction = request.header('transaction')}
-
-      // request.transaction = transaction;
       request.user = user;
 
       return true;
