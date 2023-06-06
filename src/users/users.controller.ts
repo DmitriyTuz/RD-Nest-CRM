@@ -14,9 +14,7 @@ import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {TagDto} from "./dto/add-tag.dto";
 // import {ValidationPipe} from "../validation.pipe";
-import {Transaction} from "sequelize";
 // import {AddTagsDto} from "./dto/add-tags.dto";
-// import { Transaction } from 'sequelize-transactional-cls-hooked';
 
 @ApiTags("Users")
 @Controller('users')
@@ -46,21 +44,18 @@ export class UsersController {
         }
     }
 
-    // @Get('find-user-by-tags-test')
-    // @UseGuards(JwtAuthGuard)
-    // async getUsersByTags(@Query('tags') tagIds: string, @Request() req): Promise<User[]> {
-    //     try {
-    //         const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
-    //         return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
-    //     } catch (e) {
-    //         console.log('!!! err = ', e)
-    //     }
-    // }
-
-    @Get('search-user-by-tags-test')
+// use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
+    @Get('search-users-by-tags')
     @UseGuards(JwtAuthGuard)
-    async searchUsersByTags(@Body() tags: TagDto[], @Request() req): Promise<User[]> {
+    async searchUsersByTags(@Query('tags') tags: TagDto[], @Request() req): Promise<User[]> {
         return await this.usersService.searchUsersByTags(tags, req.user.id);
+    }
+
+// use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
+    @Get('filter-users-by-tags')
+    @UseGuards(JwtAuthGuard)
+    async filterUsersByTags(@Query('tags') tags: TagDto[], @Request() req): Promise<User[]> {
+        return await this.usersService.filterUsersByTags(tags, req.user.id);
     }
 
     @ApiOperation({ summary: "Getting user by id" })

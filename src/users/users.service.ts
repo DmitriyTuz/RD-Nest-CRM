@@ -69,6 +69,8 @@ export class UsersService {
         }
     }
 
+
+
     async addTagsToUser(dto: TagDto[], currentUserId): Promise<void> {
         try {
             const user = await this.userRepository.findByPk(currentUserId);
@@ -119,8 +121,47 @@ export class UsersService {
 
     }
 
+    async searchUsersByTags(tags: TagDto[], currentUserId) {
+
+        try {
+            const user = await this.userRepository.findByPk(currentUserId);
+            if (!user) {
+                throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+            }
+
+            for (let tag of tags) {
+                if (typeof(tag.name) !== 'string' || !tag.name) {
+                    throw new HttpException(`Name must be a string and not empty`, HttpStatus.BAD_REQUEST)
+                }
+                if (typeof(tag.color) !== 'string' || !tag.color) {
+                    throw new HttpException(`Color must be a string and not empty`, HttpStatus.BAD_REQUEST)
+                }
+            }
+
+            return await User.findAll({
+                include: [
+                    {
+                        association: 'tags',
+                        where: {
+                            [Op.or]: tags.map((tag) => ({
+                                name: tag.name,
+                                color: tag.color,
+                            })),
+                        },
+                    },
+                ],
+                order: [['id', 'ASC']]
+            });
+        } catch (e) {
+            console.log('!!! ERROR in searchUsersByTags - ', e);
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
     async getUsersByTagIds(tagIds: number[], currentUserId): Promise<User[]> {
-        return User.findAll({
+
+        return await User.findAll({
             where: {
                 id: {[Op.not]: currentUserId},
             },
@@ -135,8 +176,22 @@ export class UsersService {
         });
     }
 
-    async searchUsersByTags(tags: TagDto[], currentUserId): Promise<User[]> {
+    async filterUsersByTags(tags: TagDto[], currentUserId): Promise<User[]> {
         try {
+
+            // const user = await this.userRepository.findByPk(currentUserId);
+            // if (!user) {
+            //     throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+            // }
+            //
+            // for (let tag of tags) {
+            //     if (typeof(tag.name) !== 'string' || !tag.name) {
+            //         throw new HttpException(`Name must be a string and not empty`, HttpStatus.BAD_REQUEST)
+            //     }
+            //     if (typeof(tag.color) !== 'string' || !tag.color) {
+            //         throw new HttpException(`Color must be a string and not empty`, HttpStatus.BAD_REQUEST)
+            //     }
+            // }
 
             const tagConditions = tags.map((tag) => ({
                 [Op.and]: [

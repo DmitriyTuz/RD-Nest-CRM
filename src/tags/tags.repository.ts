@@ -28,11 +28,6 @@ export class TagRepository {
         return this.tagModel.findAll({where: {[Op.or]: tags}});
     }
 
-    async findTagsByArrayOfNameAndColorWithTransaction(tags, transaction?: Transaction) {
-        // const options = transaction ? { transaction } : {};
-        return this.tagModel.findAll({where: {[Op.or]: tags}, transaction});
-    }
-
     async getTagByNameAndColor(name: string, color: string) {
         const user = await this.tagModel.findOne({where: { name, color }});
         return user;
@@ -43,38 +38,13 @@ export class TagRepository {
         return user;
     }
 
-    async create(dto: CreateTagDto, ownerId) {
-        const tag = await this.tagModel.create({...dto, ownerId: ownerId});
+    async createTag(dto: CreateTagDto, currentUserId) {
+        const tag = await this.tagModel.create({...dto, ownerId: currentUserId});
         return tag;
     }
 
     async bulkCreateTags(arrayForBulkCreate: any) {
         await this.tagModel.bulkCreate(arrayForBulkCreate)
     }
-
-    async bulkCreateTagsWithTransaction(arrayForBulkCreate: any, transaction?: Transaction): Promise<Tag[]> {
-        const options = transaction ? { transaction } : {};
-        return this.tagModel.bulkCreate(arrayForBulkCreate, options)
-    }
-
-    // async findOrCreateTags(tags, currentUserId) {
-    //     // const p = [];
-    //     // const s = [];
-    //
-    //     await this.tagModel.find
-    //
-    //     for (const t of tags) {
-    //         s.push(getOneTag({name: t[0].toLowerCase(), color: t[1]}, currentUserId));
-    //     }
-    //
-    //     return s
-    //
-    //     // return await this.tagModel.findOrCreate({
-    //     //     where: {
-    //     //         name: tags[0][0],
-    //     //         color: tags[0][1]
-    //     //     }
-    //     // })
-    // }
 
 }
