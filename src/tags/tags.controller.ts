@@ -10,13 +10,13 @@ import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 export class TagsController {
     constructor(private tagsService: TagsService) {}
 
-    // @ApiOperation({ summary: "Tag creation" })
-    // @ApiResponse({ status: 200, type: Tag })
-    // @UseGuards(JwtAuthGuard)
-    // @Post('/create-tag')
-    // create(@Body() tagDto: CreateTagDto, @Request() req) {
-    //     return this.tagsService.createTag(tagDto, req.user.id);
-    // }
+    @ApiOperation({ summary: "Tag creation" })
+    @ApiResponse({ status: 200, type: Tag })
+    @UseGuards(JwtAuthGuard)
+    @Post('/create-tag')
+    createTag(@Body() tagDto: CreateTagDto, @Request() req) {
+        return this.tagsService.createTag(tagDto, req.user.id);
+    }
 
     @ApiOperation({ summary: "Getting all tags" })
     @ApiResponse({ status: 200, type: [Tag] })
