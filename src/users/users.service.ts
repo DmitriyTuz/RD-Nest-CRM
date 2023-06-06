@@ -179,19 +179,19 @@ export class UsersService {
     async filterUsersByTags(tags: TagDto[], currentUserId): Promise<User[]> {
         try {
 
-            // const user = await this.userRepository.findByPk(currentUserId);
-            // if (!user) {
-            //     throw new HttpException("User not found", HttpStatus.NOT_FOUND);
-            // }
-            //
-            // for (let tag of tags) {
-            //     if (typeof(tag.name) !== 'string' || !tag.name) {
-            //         throw new HttpException(`Name must be a string and not empty`, HttpStatus.BAD_REQUEST)
-            //     }
-            //     if (typeof(tag.color) !== 'string' || !tag.color) {
-            //         throw new HttpException(`Color must be a string and not empty`, HttpStatus.BAD_REQUEST)
-            //     }
-            // }
+            const user = await this.userRepository.findByPk(currentUserId);
+            if (!user) {
+                throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+            }
+
+            for (let tag of tags) {
+                if (typeof(tag.name) !== 'string' || !tag.name) {
+                    throw new HttpException(`Name must be a string and not empty`, HttpStatus.BAD_REQUEST)
+                }
+                if (typeof(tag.color) !== 'string' || !tag.color) {
+                    throw new HttpException(`Color must be a string and not empty`, HttpStatus.BAD_REQUEST)
+                }
+            }
 
             const tagConditions = tags.map((tag) => ({
                 [Op.and]: [
