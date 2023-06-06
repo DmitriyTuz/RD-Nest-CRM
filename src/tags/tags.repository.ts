@@ -1,8 +1,9 @@
 import {InjectModel} from "@nestjs/sequelize";
 import {Tag} from "./tags.model";
-import {User} from "../users/users.model";
 import {CreateTagDto} from "./dto/create-tag.dto";
-import {Op, Transaction} from "sequelize";
+import {Op} from "sequelize";
+import {TagDto} from "../users/dto/add-tag.dto";
+import {HttpException, HttpStatus} from "@nestjs/common";
 
 
 // const getOneTag = async (findQuery, ownerId) => {
@@ -29,22 +30,40 @@ export class TagRepository {
     }
 
     async getTagByNameAndColor(name: string, color: string) {
-        const user = await this.tagModel.findOne({where: { name, color }});
-        return user;
+        return await this.tagModel.findOne({where: {name, color}});
     }
 
     async getTagById(id: number) {
-        const user = await this.tagModel.findOne({where: { id }});
-        return user;
+        return await this.tagModel.findOne({where: {id}});
     }
 
-    async createTag(dto: CreateTagDto, currentUserId) {
-        const tag = await this.tagModel.create({...dto, ownerId: currentUserId});
-        return tag;
+    async createUserTag(dto: CreateTagDto, currentUserId) {
+        const { name, color } = dto;
+        const tag = await this.tagModel.findOne({where: { name, color }})
+
+        if (tag) {
+            throw new HttpException("A tag with the same name and color already exists", HttpStatus.NOT_FOUND);
+        }
+
+        return await this.tagModel.create({...dto, ownerId: currentUserId});
     }
 
     async bulkCreateTags(arrayForBulkCreate: any) {
         await this.tagModel.bulkCreate(arrayForBulkCreate)
     }
 
+    async deleteUserTag(deleteTagDto: TagDto, currentUserId) {
+        const { name, color } = deleteTagDto;
+
+        const tag = await this.tagModel.findOne({ where: { name, color } });
+
+        if (!tag) {
+            throw new HttpException("Tag not found", HttpStatus.NOT_FOUND);
+        }
+
+        if (tag.ownerId !== currentUserId) {
+            throw new HttpException("The current user is not the creator of this tag", HttpStatus.BAD_REQUEST);
+        }
+        await tag.destroy();
+    }
 }

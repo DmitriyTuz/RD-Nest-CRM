@@ -1,5 +1,4 @@
 import {Injectable} from '@nestjs/common';
-import {CreateTagDto} from "./dto/create-tag.dto";
 import {TagRepository} from "./tags.repository";
 
 @Injectable()
@@ -10,11 +9,6 @@ export class TagsService {
     // ) {}
 
     constructor(private readonly tagRepository: TagRepository) {}
-
-    // async createTag(dto: CreateTagDto, userId) {
-    //     const tag = await this.tagRepository.create({...dto, ownerId: userId});
-    //     return tag;
-    // }
 
     async getAllTags() {
         return await this.tagRepository.findAll();
@@ -28,8 +22,8 @@ export class TagsService {
         return await this.tagRepository.getTagByNameAndColor(name, color);
     }
 
-    async createTag(dto: CreateTagDto, currentUserId) {
-        return await this.tagRepository.createTag(dto, currentUserId);
+    async createUserTag(dto, currentUserId) {
+        return await this.tagRepository.createUserTag(dto, currentUserId);
     }
 
     async bulkCreateTags(arrayForBulkCreate: any) {
@@ -40,4 +34,7 @@ export class TagsService {
         return await this.tagRepository.findTagsByArrayOfNameAndColor(tags)
     }
 
+    async deleteUserTag(dto, currentUserId) {
+        return await this.tagRepository.deleteUserTag(dto, currentUserId);
+    }
 }
