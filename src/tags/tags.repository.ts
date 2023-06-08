@@ -42,7 +42,7 @@ export class TagRepository {
         const tag = await this.tagModel.findOne({where: { name, color }})
 
         if (tag) {
-            throw new HttpException("A tag with the same name and color already exists", HttpStatus.NOT_FOUND);
+            throw new HttpException("Tag with the same name and color already exists", HttpStatus.NOT_FOUND);
         }
 
         return await this.tagModel.create({...dto, ownerId: currentUserId});
@@ -50,6 +50,25 @@ export class TagRepository {
 
     async bulkCreateTags(arrayForBulkCreate: any) {
         await this.tagModel.bulkCreate(arrayForBulkCreate)
+    }
+
+    async updateUserTag(dto, currentUserId) {
+        const { name, color, changeName, changeColor } = dto;
+
+        const tag = await this.tagModel.findOne({ where: { name, color } });
+
+        if (!tag) {
+            throw new HttpException("Tag not found", HttpStatus.NOT_FOUND);
+        }
+
+        if (tag.ownerId !== currentUserId) {
+            throw new HttpException("The current user is not the creator of this tag", HttpStatus.BAD_REQUEST);
+        }
+
+        tag.name = changeName;
+        tag.color = changeColor;
+
+        await tag.save();
     }
 
     async deleteUserTag(deleteTagDto: TagDto, currentUserId) {
@@ -66,4 +85,5 @@ export class TagRepository {
         }
         await tag.destroy();
     }
+
 }

@@ -34,7 +34,12 @@ export class TagsService {
         return await this.tagRepository.findTagsByArrayOfNameAndColor(tags)
     }
 
+    async updateUserTag(dto, currentUserId) {
+        return await this.tagRepository.updateUserTag(dto, currentUserId);
+    }
+
     async deleteUserTag(dto, currentUserId) {
         return await this.tagRepository.deleteUserTag(dto, currentUserId);
     }
+
 }
