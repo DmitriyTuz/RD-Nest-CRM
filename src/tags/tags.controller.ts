@@ -1,10 +1,11 @@
-import {Body, Controller, Delete, Get, Param, Post, Request, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards} from '@nestjs/common';
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {TagsService} from "./tags.service";
 import {Tag} from "./tags.model";
 import {CreateTagDto} from "./dto/create-tag.dto";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {TagDto} from "../users/dto/add-tag.dto";
+import {UpdateTagDto} from "./dto/update-tag.dto";
 
 @ApiTags("Tags")
 @Controller('tags')
@@ -31,6 +32,12 @@ export class TagsController {
     @Get('/:id')
     getById(@Param("id") id: number) {
         return this.tagsService.getTagById(id);
+    }
+
+    @Put('/update-user-tag')
+    @UseGuards(JwtAuthGuard)
+    async updateUserTag(@Body() updateTagDto: UpdateTagDto, @Request() req): Promise<void> {
+        return this.tagsService.updateUserTag(updateTagDto, req.user.id);
     }
 
     @Delete('/delete-user-tag')
