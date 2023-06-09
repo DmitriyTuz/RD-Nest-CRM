@@ -78,6 +78,8 @@ export class UsersService {
                 throw new HttpException("User not found", HttpStatus.NOT_FOUND);
             }
 
+            // console.log('!!! dto = ', dto);
+
             for (let tag of dto) {
                 if (typeof(tag.name) !== 'string' || !tag.name) {
                     throw new HttpException(`Name must be a string and not empty`, HttpStatus.BAD_REQUEST)
@@ -129,11 +131,25 @@ export class UsersService {
                 throw new HttpException("User not found", HttpStatus.NOT_FOUND);
             }
 
+            console.log('!!! tags = ', tags);
+
+            // if (!Array.isArray(tags)) {
+            //     tags = [tags];
+            // }
+
+            if (!Array.isArray(tags)) {
+                throw new HttpException(`Tags must be an array`, HttpStatus.BAD_REQUEST);
+            }
+
+            if (tags.length === 0) {
+                throw new HttpException(`Tags array must not be empty`, HttpStatus.BAD_REQUEST);
+            }
+
             for (let tag of tags) {
-                if (typeof(tag.name) !== 'string' || !tag.name) {
+                if (typeof(tag.name) !== 'string' || !tag.name || !tag.name.trim()) {
                     throw new HttpException(`Name must be a string and not empty`, HttpStatus.BAD_REQUEST)
                 }
-                if (typeof(tag.color) !== 'string' || !tag.color) {
+                if (typeof(tag.color) !== 'string' || !tag.color || !tag.color.trim()) {
                     throw new HttpException(`Color must be a string and not empty`, HttpStatus.BAD_REQUEST)
                 }
             }
