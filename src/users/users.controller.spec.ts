@@ -1,4 +1,3 @@
-import { UsersModule } from './users.module';
 import { TestHelper } from '../../test/common/test-helper';
 import { UsersService } from './users.service';
 import {UsersController} from "./users.controller";
@@ -6,10 +5,9 @@ import {AppModule} from "../app.module";
 import {AuthService} from "../auth/auth.service";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {JwtService} from "@nestjs/jwt";
-import {AuthModule} from "../auth/auth.module";
 import {UserTags} from "../tags/user-tags.model";
 
-import { Sequelize, Model } from 'sequelize-typescript';
+import { Sequelize} from 'sequelize-typescript';
 import {User} from "./users.model";
 
 
@@ -150,11 +148,45 @@ describe('UserController', () => {
   });
 
   /**
-   * Test the PUT route (add tags to auth user)
+   * Test the PUT (add tags to auth user)
    */
 
+  describe('PUT - addTagsToUser', () => {
+    it('should return an array of tags', async () => {
+      const createTestUserDto: CreateUserDto = {
+        name: 'John Doe',
+        email: 'john4.doe@example.com',
+        password: 'password'
+      }
+
+      const token = await authService.registration(createTestUserDto);
+      const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      expect(createTestUserDto.email).toBe(user.email);
+      expect(typeof(token.token)).toBe('string');
+
+      const tags = [
+        { name: 'tag4', color: '#ff0000' },
+        { name: 'tag5', color: '#00ff00' },
+        { name: 'tag6', color: '#0000ff' },
+      ];
+
+      const req = {
+        user: { id: user.id },
+      };
+
+      console.log('!!! req.user.id = ', req.user.id)
+      await userController.addTagsToUser(tags, req);
+
+      let result = await UserTags.findAll({where: {userId: user.id}})
+      expect(result.length).toBe(3);
+      expect(typeof(token.token)).toBe('string');
+
+    });
+  });
+
   describe('PUT /users/add-tags-to-user API (e2e)', () => {
-    it('should return token typeof string', async () => {
+    it('should return status of response - OK', async () => {
       const createTestUserDto: CreateUserDto = {
         name: 'John Doe',
         email: 'john2.doe@example.com',
@@ -162,7 +194,6 @@ describe('UserController', () => {
       }
 
       const token = await authService.registration(createTestUserDto);
-      // const token = await authService.registration(createTestUserDto);
       const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
 
       expect(createTestUserDto.email).toBe(user.email);
@@ -174,25 +205,304 @@ describe('UserController', () => {
         { name: 'tag3', color: '#0000ff' },
       ];
 
-      const req = {
-        user: { id: user.id },
-      };
-
       const response = await request(testHelper.app.getHttpServer())
           .put(`/users/add-tags-to-user`)
           .set('Authorization', `Bearer ${token.token}`)
           .send(tags)
 
-      // console.log('!!! response = ', response.status);
-      // console.log('!!! token = ', token.token);
-
-      // await userService.addTagsToAuthUserByTwoTagsFields(tags, req.user.id)
       let result = await UserTags.findAll({where: {userId: user.id}})
 
       expect(result.length).toBe(3);
       expect(typeof(token.token)).toBe('string');
 
       expect(response.status).toBe(HttpStatus.OK);
+    });
+  });
+
+  /**
+   * Test the GET (search users by tags auth user)
+   */
+
+  describe('GET /users/search-users-by-tags', () => {
+    it('should return an array of users', async () => {
+      const createTestUserDto1: CreateUserDto = {
+        name: 'John Doe1',
+        email: 'john1.doe@example.com',
+        password: 'password'
+      }
+
+      const token1 = await authService.registration(createTestUserDto1);
+      jwtService.verify(token1.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags1 = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' },
+        { name: 'tag3', color: '#0000ff' },
+      ];
+
+      await request(testHelper.app.getHttpServer())
+          .put(`/users/add-tags-to-user`)
+          .set('Authorization', `Bearer ${token1.token}`)
+          .send(tags1)
+
+      const createTestUserDto2: CreateUserDto = {
+        name: 'John Doe2',
+        email: 'john2.doe@example.com',
+        password: 'password'
+      }
+
+      const token2 = await authService.registration(createTestUserDto2);
+      jwtService.verify(token1.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags2 = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: 'green' },
+        { name: 'tag3', color: 'blue' },
+      ];
+
+      await request(testHelper.app.getHttpServer())
+          .put(`/users/add-tags-to-user`)
+          .set('Authorization', `Bearer ${token2.token}`)
+          .send(tags2)
+
+      const createTestUserDto: CreateUserDto = {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        password: 'password'
+      }
+
+      const token = await authService.registration(createTestUserDto);
+      const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' }
+      ];
+
+      const req = {
+        user: { id: user.id },
+      };
+
+      const users = await userController.searchUsersByTags(JSON.stringify(tags), req);
+
+      expect(users).toHaveLength(2);
+      expect(users[0]).toBeInstanceOf(User);
+      expect(users[0].name).toBe('John Doe1');
+      expect(users[1].name).toBe('John Doe2');
+    });
+  });
+
+  describe('GET /users/search-users-by-tags API (e2e)', () => {
+    it('should return an array of users status of response - OK', async () => {
+      const createTestUserDto1: CreateUserDto = {
+        name: 'John Doe1',
+        email: 'john1.doe@example.com',
+        password: 'password'
+      }
+
+      const token1 = await authService.registration(createTestUserDto1);
+      jwtService.verify(token1.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags1 = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' },
+        { name: 'tag3', color: '#0000ff' },
+      ];
+
+      await request(testHelper.app.getHttpServer())
+          .put(`/users/add-tags-to-user`)
+          .set('Authorization', `Bearer ${token1.token}`)
+          .send(tags1)
+
+      const createTestUserDto2: CreateUserDto = {
+        name: 'John Doe2',
+        email: 'john2.doe@example.com',
+        password: 'password'
+      }
+
+      const token2 = await authService.registration(createTestUserDto2);
+      jwtService.verify(token1.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags2 = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: 'green' },
+        { name: 'tag3', color: 'blue' },
+      ];
+
+      await request(testHelper.app.getHttpServer())
+          .put(`/users/add-tags-to-user`)
+          .set('Authorization', `Bearer ${token2.token}`)
+          .send(tags2)
+
+      const createTestUserDto: CreateUserDto = {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        password: 'password'
+      }
+
+      const token = await authService.registration(createTestUserDto);
+      jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' }
+      ];
+
+      const response = await request(testHelper.app.getHttpServer())
+          .get(`/users/search-users-by-tags`)
+          .set('Authorization', `Bearer ${token.token}`)
+          .query({ tags: JSON.stringify(tags) });
+
+      const users = response.body;
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(users).toHaveLength(2);
+      // expect(users[0]).toBeInstanceOf(User);
+      expect(users[0].name).toBe('John Doe1');
+      expect(users[1].name).toBe('John Doe2');
+    });
+  });
+
+  /**
+   * Test the GET (filter users by tags auth user)
+   */
+
+  describe('GET /users/filter-users-by-tags', () => {
+    it('should return an array of users', async () => {
+      const createTestUserDto1: CreateUserDto = {
+        name: 'John Doe1',
+        email: 'john1.doe@example.com',
+        password: 'password'
+      }
+
+      const token1 = await authService.registration(createTestUserDto1);
+      jwtService.verify(token1.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags1 = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' },
+        { name: 'tag3', color: '#0000ff' },
+      ];
+
+      await request(testHelper.app.getHttpServer())
+          .put(`/users/add-tags-to-user`)
+          .set('Authorization', `Bearer ${token1.token}`)
+          .send(tags1)
+
+      const createTestUserDto2: CreateUserDto = {
+        name: 'John Doe2',
+        email: 'john2.doe@example.com',
+        password: 'password'
+      }
+
+      const token2 = await authService.registration(createTestUserDto2);
+      jwtService.verify(token1.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags2 = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: 'green' },
+        { name: 'tag3', color: 'blue' },
+      ];
+
+      await request(testHelper.app.getHttpServer())
+          .put(`/users/add-tags-to-user`)
+          .set('Authorization', `Bearer ${token2.token}`)
+          .send(tags2)
+
+      const createTestUserDto: CreateUserDto = {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        password: 'password'
+      }
+
+      const token = await authService.registration(createTestUserDto);
+      const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' }
+      ];
+
+      const req = {
+        user: { id: user.id },
+      };
+
+      const users = await userController.filterUsersByTags(JSON.stringify(tags), req);
+
+      expect(users).toHaveLength(1);
+      expect(users[0]).toBeInstanceOf(User);
+      expect(users[0].name).toBe('John Doe1');
+
+    });
+  });
+
+  describe('GET /users/filter-users-by-tags API (e2e)', () => {
+    it('should return an array of users status of response - OK', async () => {
+      const createTestUserDto1: CreateUserDto = {
+        name: 'John Doe1',
+        email: 'john1.doe@example.com',
+        password: 'password'
+      }
+
+      const token1 = await authService.registration(createTestUserDto1);
+      jwtService.verify(token1.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags1 = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' },
+        { name: 'tag3', color: '#0000ff' },
+      ];
+
+      await request(testHelper.app.getHttpServer())
+          .put(`/users/add-tags-to-user`)
+          .set('Authorization', `Bearer ${token1.token}`)
+          .send(tags1)
+
+      const createTestUserDto2: CreateUserDto = {
+        name: 'John Doe2',
+        email: 'john2.doe@example.com',
+        password: 'password'
+      }
+
+      const token2 = await authService.registration(createTestUserDto2);
+      jwtService.verify(token1.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags2 = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: 'green' },
+        { name: 'tag3', color: 'blue' },
+      ];
+
+      await request(testHelper.app.getHttpServer())
+          .put(`/users/add-tags-to-user`)
+          .set('Authorization', `Bearer ${token2.token}`)
+          .send(tags2)
+
+      const createTestUserDto: CreateUserDto = {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        password: 'password'
+      }
+
+      const token = await authService.registration(createTestUserDto);
+      jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' }
+      ];
+
+      const response = await request(testHelper.app.getHttpServer())
+          .get(`/users/filter-users-by-tags`)
+          .set('Authorization', `Bearer ${token.token}`)
+          .query({ tags: JSON.stringify(tags) });
+
+      const users = response.body;
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(users).toHaveLength(1);
+      // expect(users[0]).toBeInstanceOf(User);
+      expect(users[0].name).toBe('John Doe1');
     });
   });
 

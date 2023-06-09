@@ -5,7 +5,7 @@ import {
     Post,
     UseGuards,
     Request,
-    Query, Param, HttpStatus, HttpException, Put, UsePipes, Inject, ValidationPipe
+    Query, Param, HttpStatus, HttpException, Put, UsePipes, ValidationPipe
 } from "@nestjs/common";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
@@ -47,15 +47,24 @@ export class UsersController {
 // use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
     @Get('search-users-by-tags')
     @UseGuards(JwtAuthGuard)
-    async searchUsersByTags(@Query('tags') tags: TagDto[], @Request() req): Promise<User[]> {
-        return await this.usersService.searchUsersByTags(tags, req.user.id);
+    async searchUsersByTags(@Query('tags') tags: string, @Request() req): Promise<User[]> {
+        const parsedTags = JSON.parse(tags) as TagDto[];
+        return await this.usersService.searchUsersByTags(parsedTags, req.user.id);
     }
 
-// use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
+// // use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
+//     @Get('filter-users-by-tags')
+//     @UseGuards(JwtAuthGuard)
+//     async filterUsersByTags(@Query('tags') tags: TagDto[], @Request() req): Promise<User[]> {
+//         return await this.usersService.filterUsersByTags(tags, req.user.id);
+//     }
+
+    // use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
     @Get('filter-users-by-tags')
     @UseGuards(JwtAuthGuard)
-    async filterUsersByTags(@Query('tags') tags: TagDto[], @Request() req): Promise<User[]> {
-        return await this.usersService.filterUsersByTags(tags, req.user.id);
+    async filterUsersByTags(@Query('tags') tags: string, @Request() req): Promise<User[]> {
+        const parsedTags = JSON.parse(tags) as TagDto[];
+        return await this.usersService.filterUsersByTags(parsedTags, req.user.id);
     }
 
     @ApiOperation({ summary: "Getting user by id" })
@@ -82,7 +91,7 @@ export class UsersController {
     @Put('add-tags-to-user')
     @UsePipes(ValidationPipe)
     @UseGuards(JwtAuthGuard)
-    addTagToAuthUserByTwoTagsFields(@Body() dto: TagDto[], @Request() req) {
+    addTagsToUser(@Body() dto: TagDto[], @Request() req) {
         return this.usersService.addTagsToUser(dto, req.user.id);
     }
 

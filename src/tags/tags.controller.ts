@@ -36,7 +36,7 @@ export class TagsController {
 
     @Put('/update-user-tag')
     @UseGuards(JwtAuthGuard)
-    async updateUserTag(@Body() updateTagDto: UpdateTagDto, @Request() req): Promise<void> {
+    updateUserTag(@Body() updateTagDto: UpdateTagDto, @Request() req): Promise<void> {
         return this.tagsService.updateUserTag(updateTagDto, req.user.id);
     }
 

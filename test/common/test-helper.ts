@@ -9,7 +9,6 @@ import {AuthService} from "../../src/auth/auth.service";
 import {Tag} from "../../src/tags/tags.model";
 import {UserTags} from "../../src/tags/user-tags.model";
 import sequelizeConfig from "../../config/sequelize.config";
-import {TransactionWrapperService} from "../../src/helpers/transaction-wrapper.service";
 
 export class TestHelper {
 
