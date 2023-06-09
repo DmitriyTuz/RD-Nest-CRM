@@ -55,15 +55,15 @@ export class TagRepository {
     async updateUserTag(dto, currentUserId) {
         const { name, color, changeName, changeColor } = dto;
 
-        const tag = await this.tagModel.findOne({ where: { name, color } });
+        const tag = await this.tagModel.findOne({ where: { name, color, ownerId: currentUserId } });
 
         if (!tag) {
             throw new HttpException("Tag not found", HttpStatus.NOT_FOUND);
         }
 
-        if (tag.ownerId !== currentUserId) {
-            throw new HttpException("The current user is not the creator of this tag", HttpStatus.BAD_REQUEST);
-        }
+        // if (tag.ownerId !== currentUserId) {
+        //     throw new HttpException("The current user is not the creator of this tag", HttpStatus.BAD_REQUEST);
+        // }
 
         tag.name = changeName;
         tag.color = changeColor;
@@ -74,15 +74,15 @@ export class TagRepository {
     async deleteUserTag(deleteTagDto: TagDto, currentUserId) {
         const { name, color } = deleteTagDto;
 
-        const tag = await this.tagModel.findOne({ where: { name, color } });
+        const tag = await this.tagModel.findOne({ where: { name, color, ownerId: currentUserId } });
 
         if (!tag) {
             throw new HttpException("Tag not found", HttpStatus.NOT_FOUND);
         }
 
-        if (tag.ownerId !== currentUserId) {
-            throw new HttpException("The current user is not the creator of this tag", HttpStatus.BAD_REQUEST);
-        }
+        // if (tag.ownerId !== currentUserId) {
+        //     throw new HttpException("The current user is not the creator of this tag", HttpStatus.BAD_REQUEST);
+        // }
         await tag.destroy();
     }
 

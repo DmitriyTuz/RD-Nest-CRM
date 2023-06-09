@@ -10,6 +10,7 @@ import {CreateUserDto} from "../users/dto/create-user.dto";
 import {TagDto} from "../users/dto/add-tag.dto";
 import {TagsService} from "./tags.service";
 import {Tag} from "./tags.model";
+import {UpdateTagDto} from "./dto/update-tag.dto";
 
 describe('TagController', () => {
 
@@ -81,10 +82,7 @@ describe('TagController', () => {
         user: { id: user.id },
       };
 
-      const createTestTagDto: TagDto = {
-        name: 'tag1',
-        color: '#ff0000',
-      }
+      const createTestTagDto: TagDto = { name: 'tag1', color: '#ff0000' }
 
       const tag = await tagController.createUserTag(createTestTagDto, req)
 
@@ -126,7 +124,7 @@ describe('TagController', () => {
    */
 
   describe('DELETE - deleteUserTag', () => {
-    it('should return null', async () => {
+    it('should successfully remove tag', async () => {
       const createTestUserDto: CreateUserDto = {
         name: 'John Doe',
         email: 'john.doe@example.com',
@@ -148,7 +146,7 @@ describe('TagController', () => {
         user: { id: user.id },
       };
 
-      const deleteTestTagDto = { name: 'tag1', color: '#ff0000', ownerId: user.id }
+      const deleteTestTagDto = { name: 'tag1', color: '#ff0000' }
 
       await tagController.deleteUserTag(deleteTestTagDto, req)
 
@@ -159,7 +157,7 @@ describe('TagController', () => {
   });
 
   describe('DELETE - /tags/delete-user-tag API (e2e)', () => {
-    it('should return null', async () => {
+    it('should successfully remove tag', async () => {
       const createTestUserDto: CreateUserDto = {
         name: 'John Doe',
         email: 'john.doe@example.com',
@@ -177,7 +175,7 @@ describe('TagController', () => {
       const arrayForBulkCreate = tags.map((tag) => ({ ...tag, ownerId: user.id }));
       await tagService.bulkCreateTags(arrayForBulkCreate);
 
-      const deleteTestTagDto = { name: 'tag1', color: '#ff0000', ownerId: user.id }
+      const deleteTestTagDto = { name: 'tag1', color: '#ff0000' }
 
       const response = await request(testHelper.app.getHttpServer())
           .delete(`/tags/delete-user-tag`)
@@ -186,7 +184,80 @@ describe('TagController', () => {
 
       const tagsResult = await Tag.findOne({where: { name: 'tag1', color: '#ff0000', ownerId: user.id }})
 
+      expect(response.status).toBe(HttpStatus.OK);
       expect(tagsResult).toBe(null);
+    });
+  });
+
+  /**
+   * Test the PUT (updating a tag associated with an authorized user profile)
+   */
+
+  describe('PUT - updateUserTag', () => {
+    it('should successfully update tag', async () => {
+      const createTestUserDto: CreateUserDto = {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        password: 'password'
+      }
+
+      const token = await authService.registration(createTestUserDto);
+      const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' }
+      ];
+
+      const arrayForBulkCreate = tags.map((tag) => ({ ...tag, ownerId: user.id }));
+      await tagService.bulkCreateTags(arrayForBulkCreate);
+
+      const req = {
+        user: { id: user.id },
+      };
+
+      const updateTestTagDto: UpdateTagDto = { name: 'tag1', color: '#ff0000', changeName: 'tag3', changeColor: '#00ff00' }
+
+      await tagController.updateUserTag(updateTestTagDto, req)
+
+      const tagsResult = await Tag.findOne({where: { name: 'tag3', color: '#00ff00', ownerId: user.id }})
+
+      expect(tagsResult.name).toBe('tag3');
+      expect(tagsResult.color).toBe('#00ff00');
+    });
+  });
+
+  describe('PUT - /tags/update-user-tag API (e2e)', () => {
+    it('should successfully update tag', async () => {
+      const createTestUserDto: CreateUserDto = {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        password: 'password'
+      }
+
+      const token = await authService.registration(createTestUserDto);
+      const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+      const tags = [
+        { name: 'tag1', color: '#ff0000' },
+        { name: 'tag2', color: '#00ff00' }
+      ];
+
+      const arrayForBulkCreate = tags.map((tag) => ({ ...tag, ownerId: user.id }));
+      await tagService.bulkCreateTags(arrayForBulkCreate);
+
+      const updateTestTagDto: UpdateTagDto = { name: 'tag1', color: '#ff0000', changeName: 'tag3', changeColor: '#00ff00' }
+
+      const response = await request(testHelper.app.getHttpServer())
+          .put(`/tags/update-user-tag`)
+          .set('Authorization', `Bearer ${token.token}`)
+          .send(updateTestTagDto)
+
+      const tagsResult = await Tag.findOne({where: { name: 'tag3', color: '#00ff00', ownerId: user.id }})
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(tagsResult.name).toBe('tag3');
+      expect(tagsResult.color).toBe('#00ff00');
     });
   });
 
