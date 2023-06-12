@@ -14,6 +14,8 @@ async function start() {
         .setDescription("Documentation REST API")
         .setVersion("0.0.1")
         .addTag("D_TUZ")
+        .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+            'JWT')
         .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup("/api/docs", app, document);
