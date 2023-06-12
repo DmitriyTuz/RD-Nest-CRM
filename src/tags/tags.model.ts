@@ -34,7 +34,7 @@ export class Tag extends Model<Tag, TagCreationAttrs> {
     })
     name: string;
 
-    @ApiProperty({ example: "red", description: "color: green - junior, blue - medium, red - pro" })
+    @ApiProperty({ example: "#ff0000", description: "tag color" })
     @Column({
         type: DataType.STRING,
         allowNull: false

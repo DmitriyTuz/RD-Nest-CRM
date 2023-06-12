@@ -4,10 +4,11 @@ import {CreateUserDto} from "./dto/create-user.dto";
 import {TagDto} from "./dto/add-tag.dto";
 import {TagsService} from "../tags/tags.service";
 import {Tag} from "../tags/tags.model";
-import {Op, Sequelize} from 'sequelize';
+import {Op, Sequelize, QueryTypes } from 'sequelize';
 import {UserRepository} from "./users.repository";
 import {UserTags} from "../tags/user-tags.model";
 import {User} from "./users.model";
+import sequelizeConfig from "../../config/sequelize.config";
 
 @Injectable()
 export class UsersService {
@@ -210,29 +211,32 @@ export class UsersService {
             }
 
             const tagConditions = tags.map((tag) => ({
-                [Op.and]: [
-                    { name: tag.name },
-                    { color: tag.color },
-                ],
+                name: tag.name,
+                color: tag.color,
             }));
 
-            const tagIds = await Tag.findAll({
-                where: {
-                    [Op.or]: tagConditions,
-                },
-                attributes: ['id'], // Получаем только идентификаторы тегов
-            });
+            const tagIds = [];
+            for (const tagCondition of tagConditions) {
+                const tag = await Tag.findOne({
+                    where: tagCondition,
+                    attributes: ['id'],
+                });
 
-            const tagIdsArray = tagIds.map((tag) => tag.id);
+                if (!tag) {
+                    throw new HttpException(`Tag not found: ${JSON.stringify(tagCondition)}`, HttpStatus.NOT_FOUND);
+                }
 
-            return  await User.findAll({
+                tagIds.push(tag.id);
+            }
+
+            return await User.findAll({
                 where: {
                     id: {
                         [Op.not]: currentUserId,
                         [Op.in]: Sequelize.literal(`(
-                            SELECT "userId" FROM "user_tags" WHERE "tagId" IN (${tagIdsArray.join(',')})
+                            SELECT "userId" FROM "user_tags" WHERE "tagId" IN (${tagIds.join(',')})
                             GROUP BY "userId"
-                            HAVING COUNT(DISTINCT "tagId") = ${tagIdsArray.length}
+                            HAVING COUNT(DISTINCT "tagId") = ${tagIds.length}
                         )`),
                     },
                 },
@@ -243,17 +247,16 @@ export class UsersService {
                         as: 'tags',
                         where: {
                             id: {
-                                [Op.in]: tagIdsArray, // Ищем пользователей, у которых есть все найденные теги
+
+                                [Op.in]: tagIds,
                             },
                         },
                         through: { attributes: [] },
                     },
-                ],
-                // group: ['User.id', 'user_tags'], // Группируем только по идентификатору пользователя
-                // having: Sequelize.literal(`COUNT(DISTINCT tags.id) = ${tags.length}`),
+                ]
             });
         } catch (e) {
-            console.log('!!! ERROR in searchUsersByTags - ', e);
+            console.log('!!! ERROR in filterUsersByTags - ', e);
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
     }

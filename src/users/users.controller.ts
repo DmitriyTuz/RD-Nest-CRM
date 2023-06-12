@@ -9,12 +9,10 @@ import {
 } from "@nestjs/common";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
-import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {TagDto} from "./dto/add-tag.dto";
-// import {ValidationPipe} from "../validation.pipe";
-// import {AddTagsDto} from "./dto/add-tags.dto";
 
 @ApiTags("Users")
 @Controller('users')
@@ -23,7 +21,6 @@ export class UsersController {
 
     @ApiOperation({ summary: "Getting all users" })
     @ApiResponse({ status: 200, type: [User] })
-    // @UseGuards(JwtAuthGuard)
     @Get('get-all-users')
     GetAllUsers() {
         try {
@@ -33,35 +30,55 @@ export class UsersController {
         }
     }
 
-    @Get('find-user-by-tags')
-    @UseGuards(JwtAuthGuard)
-    async getUsersByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
-        try {
-            const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
-            return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
-        } catch (e) {
-            console.log('!!! err = ', e)
-        }
-    }
+    // @Get('find-user-by-tags')
+    // @UseGuards(JwtAuthGuard)
+    // async getUsersByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
+    //     try {
+    //         const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
+    //         return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
+    //     } catch (e) {
+    //         console.log('!!! err = ', e)
+    //     }
+    // }
 
-// use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
     @Get('search-users-by-tags')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
+    @ApiOperation({ summary: "Search by authorized user of users by tags" })
+    @ApiQuery({
+        name: 'tags',
+        type: 'string',
+        required: true,
+        example: '[{"name":"Education","color":"green"},{"name":"Nature10","color":"gold"}]',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully retrieved users',
+        type: User,
+        isArray: true,
+    })
     async searchUsersByTags(@Query('tags') tags: string, @Request() req): Promise<User[]> {
         const parsedTags = JSON.parse(tags) as TagDto[];
         return await this.usersService.searchUsersByTags(parsedTags, req.user.id);
     }
 
-// // use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
-//     @Get('filter-users-by-tags')
-//     @UseGuards(JwtAuthGuard)
-//     async filterUsersByTags(@Query('tags') tags: TagDto[], @Request() req): Promise<User[]> {
-//         return await this.usersService.filterUsersByTags(tags, req.user.id);
-//     }
-
     // use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
     @Get('filter-users-by-tags')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
+    @ApiOperation({ summary: "Filter by authorized user of users by tags" })
+    @ApiQuery({
+        name: 'tags',
+        type: 'string',
+        required: true,
+        example: '[{"name":"Education","color":"green"},{"name":"Nature10","color":"gold"}]',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully retrieved users',
+        type: User,
+        isArray: true,
+    })
     async filterUsersByTags(@Query('tags') tags: string, @Request() req): Promise<User[]> {
         const parsedTags = JSON.parse(tags) as TagDto[];
         return await this.usersService.filterUsersByTags(parsedTags, req.user.id);
