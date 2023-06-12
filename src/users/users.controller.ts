@@ -9,12 +9,14 @@ import {
 } from "@nestjs/common";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
-import {ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiBody, ApiExtraModels, ApiOperation, ApiQuery, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {TagDto} from "./dto/add-tag.dto";
+import {Tag} from "../tags/tags.model";
 
 @ApiTags("Users")
+@ApiExtraModels(TagDto)
 @Controller('users')
 export class UsersController {
     constructor(private usersService: UsersService) {}
@@ -105,12 +107,49 @@ export class UsersController {
         return this.usersService.addTagToUser(dto, req);
     }
 
+    // @Put('add-tags-to-user')
+    // @UsePipes(ValidationPipe)
+    // @UseGuards(JwtAuthGuard)
+    // @ApiBearerAuth('JWT')
+    // @ApiOperation({ summary: "Add tags to his profile by an authorized user" })
+    // @ApiQuery({
+    //     name: 'tags',
+    //     type: 'string',
+    //     required: true,
+    //     example: '[{"name":"Education","color":"green"},{"name":"Nature10","color":"gold"}]',
+    // })
+    // @ApiResponse({
+    //     status: 200,
+    //     description: 'Successfully added tags'
+    // })
+    // async addTagsToUser(@Query('tags') tags: string, @Request() req): Promise<void> {
+    //     const parsedTags = JSON.parse(tags) as TagDto[];
+    //     return await this.usersService.addTagsToUser(parsedTags, req.user.id);
+    // }
+
+    // @Put('add-tags-to-user')
+    // @UsePipes(ValidationPipe)
+    // @UseGuards(JwtAuthGuard)
+    // @ApiBearerAuth('JWT')
+    // addTagsToUser(@Body() dto: TagDto[], @Request() req) {
+    //     return this.usersService.addTagsToUser(dto, req.user.id);
+    // }
+
     @Put('add-tags-to-user')
     @UsePipes(ValidationPipe)
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
+    @ApiOperation({ summary: "Add tags to his profile by an authorized user" })
+    @ApiBody({ type: [TagDto] })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully added tags'
+    })
     addTagsToUser(@Body() dto: TagDto[], @Request() req) {
         return this.usersService.addTagsToUser(dto, req.user.id);
     }
+
+
 
 }
 
