@@ -21,9 +21,9 @@ import {Tag} from "../tags/tags.model";
 export class UsersController {
     constructor(private usersService: UsersService) {}
 
+    @Get('get-all-users')
     @ApiOperation({ summary: "Getting all users" })
     @ApiResponse({ status: 200, type: [User] })
-    @Get('get-all-users')
     GetAllUsers() {
         try {
             return this.usersService.GetAllUsers();
@@ -31,17 +31,6 @@ export class UsersController {
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
     }
-
-    // @Get('find-user-by-tags')
-    // @UseGuards(JwtAuthGuard)
-    // async getUsersByTags(@Query('tagIds') tagIds: string, @Request() req): Promise<User[]> {
-    //     try {
-    //         const tagIdArr = tagIds.split(',').map((id) => parseInt(id, 10));
-    //         return this.usersService.getUsersByTagIds(tagIdArr, req.user.id);
-    //     } catch (e) {
-    //         console.log('!!! err = ', e)
-    //     }
-    // }
 
     @Get('search-users-by-tags')
     @UseGuards(JwtAuthGuard)
@@ -59,12 +48,11 @@ export class UsersController {
         type: User,
         isArray: true,
     })
-    async searchUsersByTags(@Query('tags') tags: string, @Request() req): Promise<User[]> {
+    searchUsersByTags(@Query('tags') tags: string, @Request() req): Promise<User[]> {
         const parsedTags = JSON.parse(tags) as TagDto[];
-        return await this.usersService.searchUsersByTags(parsedTags, req.user.id);
+        return this.usersService.searchUsersByTags(parsedTags, req.user.id);
     }
 
-    // use in postman !!! - GET /users/search?tags[0][name]=Education&tags[0][color]=green&tags[1][name]=Nature10&tags[1][color]=gold
     @Get('filter-users-by-tags')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('JWT')
@@ -81,24 +69,24 @@ export class UsersController {
         type: User,
         isArray: true,
     })
-    async filterUsersByTags(@Query('tags') tags: string, @Request() req): Promise<User[]> {
+    filterUsersByTags(@Query('tags') tags: string, @Request() req): Promise<User[]> {
         const parsedTags = JSON.parse(tags) as TagDto[];
-        return await this.usersService.filterUsersByTags(parsedTags, req.user.id);
+        return this.usersService.filterUsersByTags(parsedTags, req.user.id);
     }
 
+    @Get(':id')
     @ApiOperation({ summary: "Getting user by id" })
     @ApiResponse({ status: 200, type: User })
-    @Get(':id')
-    async getUserById(@Param('id') id: number): Promise<User> {
-        return await this.usersService.getUserById(id);
+    getUserById(@Param('id') id: number): Promise<User> {
+        return this.usersService.getUserById(id);
     }
 
+    @Post('create-user')
     @ApiOperation({ summary: "User creation" })
     @ApiResponse({ status: 200, type: User })
     @UsePipes(ValidationPipe)
-    @Post('create-user')
-    async createUser(@Body() userDto: CreateUserDto) {
-        return await this.usersService.createUser(userDto);
+    createUser(@Body() userDto: CreateUserDto) {
+        return this.usersService.createUser(userDto);
     }
 
     @Put('add-tag-to-user')
@@ -106,34 +94,6 @@ export class UsersController {
     addTagToUser(@Body() dto: TagDto, @Request() req) {
         return this.usersService.addTagToUser(dto, req);
     }
-
-    // @Put('add-tags-to-user')
-    // @UsePipes(ValidationPipe)
-    // @UseGuards(JwtAuthGuard)
-    // @ApiBearerAuth('JWT')
-    // @ApiOperation({ summary: "Add tags to his profile by an authorized user" })
-    // @ApiQuery({
-    //     name: 'tags',
-    //     type: 'string',
-    //     required: true,
-    //     example: '[{"name":"Education","color":"green"},{"name":"Nature10","color":"gold"}]',
-    // })
-    // @ApiResponse({
-    //     status: 200,
-    //     description: 'Successfully added tags'
-    // })
-    // async addTagsToUser(@Query('tags') tags: string, @Request() req): Promise<void> {
-    //     const parsedTags = JSON.parse(tags) as TagDto[];
-    //     return await this.usersService.addTagsToUser(parsedTags, req.user.id);
-    // }
-
-    // @Put('add-tags-to-user')
-    // @UsePipes(ValidationPipe)
-    // @UseGuards(JwtAuthGuard)
-    // @ApiBearerAuth('JWT')
-    // addTagsToUser(@Body() dto: TagDto[], @Request() req) {
-    //     return this.usersService.addTagsToUser(dto, req.user.id);
-    // }
 
     @Put('add-tags-to-user')
     @UsePipes(ValidationPipe)
