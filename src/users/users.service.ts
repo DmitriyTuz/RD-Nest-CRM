@@ -79,8 +79,6 @@ export class UsersService {
                 throw new HttpException("User not found", HttpStatus.NOT_FOUND);
             }
 
-            // console.log('!!! dto = ', dto);
-
             for (let tag of dto) {
                 if (typeof(tag.name) !== 'string' || !tag.name) {
                     throw new HttpException(`Name must be a string and not empty`, HttpStatus.BAD_REQUEST)
@@ -132,12 +130,6 @@ export class UsersService {
                 throw new HttpException("User not found", HttpStatus.NOT_FOUND);
             }
 
-            console.log('!!! tags = ', tags);
-
-            // if (!Array.isArray(tags)) {
-            //     tags = [tags];
-            // }
-
             if (!Array.isArray(tags)) {
                 throw new HttpException(`Tags must be an array`, HttpStatus.BAD_REQUEST);
             }
@@ -170,27 +162,9 @@ export class UsersService {
                 order: [['id', 'ASC']]
             });
         } catch (e) {
-            console.log('!!! ERROR in searchUsersByTags - ', e);
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
 
-    }
-
-    async getUsersByTagIds(tagIds: number[], currentUserId): Promise<User[]> {
-
-        return await User.findAll({
-            where: {
-                id: {[Op.not]: currentUserId},
-            },
-            include: [
-                {
-                    model: Tag,
-                    where: {
-                        id: tagIds
-                    }
-                }
-            ]
-        });
     }
 
     async filterUsersByTags(tags: TagDto[], currentUserId): Promise<User[]> {
@@ -256,7 +230,6 @@ export class UsersService {
                 ]
             });
         } catch (e) {
-            console.log('!!! ERROR in filterUsersByTags - ', e);
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }
     }

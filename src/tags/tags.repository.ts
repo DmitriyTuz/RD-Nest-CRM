@@ -58,12 +58,8 @@ export class TagRepository {
         const tag = await this.tagModel.findOne({ where: { name, color, ownerId: currentUserId } });
 
         if (!tag) {
-            throw new HttpException("Tag not found", HttpStatus.NOT_FOUND);
+            throw new HttpException("Tag not found or not created by this user", HttpStatus.NOT_FOUND);
         }
-
-        // if (tag.ownerId !== currentUserId) {
-        //     throw new HttpException("The current user is not the creator of this tag", HttpStatus.BAD_REQUEST);
-        // }
 
         tag.name = changeName;
         tag.color = changeColor;
@@ -77,7 +73,7 @@ export class TagRepository {
         const tag = await this.tagModel.findOne({ where: { name, color, ownerId: currentUserId } });
 
         if (!tag) {
-            throw new HttpException("Tag not found", HttpStatus.NOT_FOUND);
+            throw new HttpException("Tag not found or not created by this user", HttpStatus.NOT_FOUND);
         }
 
         // if (tag.ownerId !== currentUserId) {

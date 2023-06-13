@@ -1,5 +1,5 @@
 import {Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards} from '@nestjs/common';
-import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {TagsService} from "./tags.service";
 import {Tag} from "./tags.model";
 import {CreateTagDto} from "./dto/create-tag.dto";
@@ -12,9 +12,10 @@ import {UpdateTagDto} from "./dto/update-tag.dto";
 export class TagsController {
     constructor(private tagsService: TagsService) {}
 
-    // @ApiOperation({ summary: "Tag creation" })
-    // @ApiResponse({ status: 200, type: Tag })
+    @ApiOperation({ summary: "Tag creation" })
+    @ApiResponse({ status: 200, type: Tag })
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
     @Post('/create-user-tag')
     createUserTag(@Body() tagDto: CreateTagDto, @Request() req) {
         return this.tagsService.createUserTag(tagDto, req.user.id);
@@ -36,12 +37,16 @@ export class TagsController {
 
     @Put('/update-user-tag')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
+    @ApiOperation({ summary: "Tag update" })
     updateUserTag(@Body() updateTagDto: UpdateTagDto, @Request() req): Promise<void> {
         return this.tagsService.updateUserTag(updateTagDto, req.user.id);
     }
 
     @Delete('/delete-user-tag')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
+    @ApiOperation({ summary: "Tag remove" })
     deleteUserTag(@Body() deleteTagDto: TagDto, @Request() req): Promise<void> {
         return this.tagsService.deleteUserTag(deleteTagDto, req.user.id);
     }
