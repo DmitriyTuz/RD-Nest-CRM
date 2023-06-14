@@ -74,4 +74,8 @@ export class AuthService {
       message: "Incorrect email address or password",
     });
   }
+
+  validateUserByEmail(email: string): Promise<User | null> {
+    return this.userService.getUserByEmail(email);
+  }
 }
