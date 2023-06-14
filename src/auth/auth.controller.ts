@@ -4,6 +4,7 @@ import { CreateUserDto } from "../users/dto/create-user.dto";
 import { AuthService } from "./auth.service";
 import {JwtAuthGuard} from "./jwt-auth.guard";
 import {ValidationPipe} from "../validation.pipe";
+import {AuthGuard} from "@nestjs/passport";
 
 @ApiTags("Authorization")
 @Controller("auth")
@@ -26,4 +27,5 @@ export class AuthController {
   getCurrentUser(@Request() req) {
     return this.authService.getCurrentUser(req);
   }
+
 }

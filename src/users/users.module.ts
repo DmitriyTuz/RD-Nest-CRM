@@ -8,8 +8,6 @@ import {UserTags} from "../tags/user-tags.model";
 import {AuthModule} from "../auth/auth.module";
 import {TagsModule} from "../tags/tags.module";
 import {UserRepository} from "./users.repository";
-import {TagsService} from "../tags/tags.service";
-import {TagRepository} from "../tags/tags.repository";
 
 @Module({
   controllers: [UsersController],
