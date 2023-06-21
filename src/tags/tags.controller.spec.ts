@@ -175,14 +175,11 @@ describe('TagController', () => {
       const arrayForBulkCreate = tags.map((tag) => ({ ...tag, ownerId: user.id }));
       await tagService.bulkCreateTags(arrayForBulkCreate);
 
-      // const deleteTestTagDto = { name: 'tag1', color: '#ff0000' }
-
       const tag = await tagService.getTagByNameAndColor('tag1', '#ff0000')
 
       const response = await request(testHelper.app.getHttpServer())
           .delete(`/tags/delete-user-tag/${tag.id}`)
           .set('Authorization', `Bearer ${token.token}`)
-          // .send(deleteTestTagDto)
 
       const tagsResult = await Tag.findOne({where: { name: 'tag1', color: '#ff0000', ownerId: user.id }})
 
@@ -266,4 +263,34 @@ describe('TagController', () => {
     });
   });
 
+  it('should return status NOT_FOUND', async () => {
+    const createTestUserDto: CreateUserDto = {
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      password: 'password'
+    }
+
+    const token = await authService.registration(createTestUserDto);
+    const user = jwtService.verify(token.token, {secret: process.env.PRIVATE_KEY ||  "SECRET"});
+
+    const tags = [
+      { name: 'tag1', color: '#ff0000' },
+      { name: 'tag2', color: '#00ff00' }
+    ];
+
+    const arrayForBulkCreate = tags.map((tag) => ({ ...tag, ownerId: user.id }));
+    await tagService.bulkCreateTags(arrayForBulkCreate);
+
+    const tag = await tagService.getTagByNameAndColor('tag1', '#ff0000')
+
+    const updateTestTagDto: UpdateTagDto = { changeName: 'tag3', changeColor: '#00ff00' }
+
+    const response = await request(testHelper.app.getHttpServer())
+        .put(`/tags/update-user-tag/${tag.id + 100000}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .send(updateTestTagDto)
+
+    expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    expect(response.body.message).toBe("Tag not found or not created by this user");
+  });
 });
