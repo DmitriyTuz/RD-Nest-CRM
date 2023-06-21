@@ -17,7 +17,6 @@ import {TagsService} from "./tags.service";
 import {Tag} from "./tags.model";
 import {CreateTagDto} from "./dto/create-tag.dto";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {TagDto} from "../users/dto/add-tag.dto";
 import {UpdateTagDto} from "./dto/update-tag.dto";
 
 @ApiTags("Tags")
