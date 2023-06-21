@@ -107,15 +107,15 @@ describe('TagController', () => {
       const arrayForBulkCreate = tags.map((tag) => ({ ...tag, ownerId: user.id }));
       await tagService.bulkCreateTags(arrayForBulkCreate);
 
+      const tag = await tagService.getTagByNameAndColor('tag1', '#ff0000')
+
       const req = {
         user: { id: user.id },
       };
 
-      const deleteTestTagDto = { name: 'tag1', color: '#ff0000', ownerId: user.id }
+      await tagService.deleteUserTag(tag.id, req.user.id)
 
-      await tagService.deleteUserTag(deleteTestTagDto, req.user.id)
-
-      const tagsResult = await Tag.findOne({where: { name: 'tag1', color: '#ff0000', ownerId: user.id }})
+      const tagsResult = await Tag.findOne({where: {id: tag.id}})
 
       expect(tagsResult).toBe(null);
     });
@@ -144,15 +144,17 @@ describe('TagController', () => {
       const arrayForBulkCreate = tags.map((tag) => ({ ...tag, ownerId: user.id }));
       await tagService.bulkCreateTags(arrayForBulkCreate);
 
+      const tag = await tagService.getTagByNameAndColor('tag1', '#ff0000')
+
       const req = {
         user: { id: user.id },
       };
 
-      const updateTestTagDto: UpdateTagDto = { name: 'tag1', color: '#ff0000', changeName: 'tag3', changeColor: '#00ff00' }
+      const updateTestTagDto: UpdateTagDto = { changeName: 'tag3', changeColor: '#00ff00' }
 
-      await tagService.updateUserTag(updateTestTagDto, req.user.id)
+      await tagService.updateUserTag(tag.id, updateTestTagDto, req.user.id)
 
-      const tagsResult = await Tag.findOne({where: { name: 'tag3', color: '#00ff00', ownerId: user.id }})
+      const tagsResult = await Tag.findOne({where: { id: tag.id }})
 
       expect(tagsResult.name).toBe('tag3');
       expect(tagsResult.color).toBe('#00ff00');

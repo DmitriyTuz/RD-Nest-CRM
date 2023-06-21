@@ -4,7 +4,7 @@ import {CreateUserDto} from "./dto/create-user.dto";
 import {TagDto} from "./dto/add-tag.dto";
 import {TagsService} from "../tags/tags.service";
 import {Tag} from "../tags/tags.model";
-import {Op, Sequelize, QueryTypes } from 'sequelize';
+import {Op, Sequelize, Order, QueryTypes } from 'sequelize';
 import {UserRepository} from "./users.repository";
 import {UserTags} from "../tags/user-tags.model";
 import {User} from "./users.model";
@@ -167,12 +167,97 @@ export class UsersService {
 
     }
 
+    async searchUsersByTag(tagName: string, currentUserId) {
+
+        try {
+            const user = await this.userRepository.findByPk(currentUserId);
+            if (!user) {
+                throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+            }
+
+            // if (typeof(tag.name) !== 'string' || !tag.name || !tag.name.trim()) {
+            //     throw new HttpException(`Name must be a string and not empty`, HttpStatus.BAD_REQUEST)
+            // }
+            // if (typeof(tag.color) !== 'string' || !tag.color || !tag.color.trim()) {
+            //     throw new HttpException(`Color must be a string and not empty`, HttpStatus.BAD_REQUEST)
+            // }
+            //
+            // console.log('!!! tag = ', tag)
+
+            return await User.findAll({
+                include: [
+                    {
+                        association: 'tags',
+                        where: {
+                                // name: tagName
+                            name: {[Op.iLike]: `%${tagName}%`}
+                            // [Op.or]: [{name: {[Op.iLike]: `%${tagName}%`}}]
+                        },
+                    },
+                ],
+                order: [['id', 'ASC']]
+            });
+        } catch (e) {
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    async searchUsersByTagNames(tagNames, searchByPartOfTagName, currentUserId) {
+        try {
+            const user = await this.userRepository.findByPk(currentUserId);
+            if (!user) {
+                throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+            }
+
+            let query = {
+                include: [
+                    {
+                        association: 'tags',
+                        where: {},
+                    },
+                ],
+                order: [['id', 'ASC']] as Order,
+                where: {}
+            };
+
+            if (tagNames && tagNames.length > 0) {
+                query.include[0].where['name'] = {
+                    [Op.in]: tagNames,
+                };
+            }
+
+            if (searchByPartOfTagName) {
+                query.include[0].where['name'] = { [Op.iLike]: `%${searchByPartOfTagName}%` };
+            }
+
+            if (tagNames && tagNames.length > 0 && searchByPartOfTagName) {
+                query.include[0].where['name'] = {
+                    [Op.iLike]: `%${searchByPartOfTagName}%`,
+                    [Op.in]: tagNames
+                };
+            }
+
+            return await User.findAll(query);
+        } catch (e) {
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     async filterUsersByTags(tags: TagDto[], currentUserId): Promise<User[]> {
         try {
 
             const user = await this.userRepository.findByPk(currentUserId);
             if (!user) {
                 throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+            }
+
+            if (!Array.isArray(tags)) {
+                throw new HttpException(`Tags must be an array`, HttpStatus.BAD_REQUEST);
+            }
+
+            if (tags.length === 0) {
+                throw new HttpException(`Tags array must not be empty`, HttpStatus.BAD_REQUEST);
             }
 
             for (let tag of tags) {
@@ -206,7 +291,7 @@ export class UsersService {
             return await User.findAll({
                 where: {
                     id: {
-                        [Op.not]: currentUserId,
+                        // [Op.not]: currentUserId,
                         [Op.in]: Sequelize.literal(`(
                             SELECT "userId" FROM "user_tags" WHERE "tagId" IN (${tagIds.join(',')})
                             GROUP BY "userId"
@@ -229,6 +314,32 @@ export class UsersService {
                     },
                 ]
             });
+        } catch (e) {
+            throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async filterUsersByTag(tag: TagDto, currentUserId): Promise<User[]> {
+        try {
+            const user = await this.userRepository.findByPk(currentUserId);
+            if (!user) {
+                throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+            }
+
+            const { name, color } = tag;
+            const { count, rows } = await User.findAndCountAll({
+                where: {
+                    '$tags.name$': name,
+                    '$tags.color$': color,
+                },
+                include: [{ association: 'tags' }],
+                raw: true,
+            });
+
+            console.log('Count:', count);
+            console.log('Users:', rows);
+
+            return rows;
         } catch (e) {
             throw new HttpException(`${e.message}`, HttpStatus.BAD_REQUEST);
         }

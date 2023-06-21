@@ -53,6 +53,64 @@ export class UsersController {
         return this.usersService.searchUsersByTags(parsedTags, req.user.id);
     }
 
+    @Get('search-users-by-tag')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
+    @ApiOperation({ summary: "Search by authorized user of users by tag" })
+    @ApiQuery({
+        name: 'tag',
+        type: 'string',
+        required: true,
+        example: '{"name":"Education","color":"green"}',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully retrieved users',
+        type: User,
+        isArray: true,
+    })
+    searchUsersByTag(@Query('tagName') tagName: string, @Request() req): Promise<User[]> {
+
+        return this.usersService.searchUsersByTag(tagName, req.user.id);
+    }
+
+    @Get('search-users-by-tagNames')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
+    @ApiOperation({ summary: 'Search by authorized user of users by tag' })
+    @ApiQuery({
+        name: 'tagNames',
+        type: 'string',
+        required: false,
+        isArray: true,
+        example: 'Nature,Nature1,Nature2',
+    })
+    @ApiQuery({
+        name: 'searchByPartOfTagName',
+        type: 'string',
+        required: false,
+        example: 'Na',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully retrieved users',
+        type: User,
+        isArray: true,
+    })
+    searchUsersByTagNames(
+        @Query('tagNames') tagNames: string,
+        @Query('search') searchByPartOfTagName: string,
+        // @Query('search') search: string,
+
+        @Request() req,
+    ): Promise<User[]> {
+        let parsedTagNames: string[] = [];
+        if (tagNames) {
+            parsedTagNames = JSON.parse(tagNames) as string[];
+        }
+        return this.usersService.searchUsersByTagNames(parsedTagNames, searchByPartOfTagName, req.user.id);
+    }
+
     @Get('filter-users-by-tags')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('JWT')
@@ -72,6 +130,27 @@ export class UsersController {
     filterUsersByTags(@Query('tags') tags: string, @Request() req): Promise<User[]> {
         const parsedTags = JSON.parse(tags) as TagDto[];
         return this.usersService.filterUsersByTags(parsedTags, req.user.id);
+    }
+
+    @Get('filter-users-by-tag')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
+    @ApiOperation({ summary: "Filter by authorized user of users by tag" })
+    @ApiQuery({
+        name: 'tags',
+        type: 'string',
+        required: true,
+        example: '{"name":"Education","color":"green"}',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully retrieved users',
+        type: User,
+        isArray: true,
+    })
+    filterUsersByTag(@Query('tag') tag: string, @Request() req): Promise<User[]> {
+        const parsedTag: TagDto = JSON.parse(tag);
+        return this.usersService.filterUsersByTag(parsedTag, req.user.id);
     }
 
     @Get(':id')
@@ -108,8 +187,5 @@ export class UsersController {
     addTagsToUser(@Body() dto: TagDto[], @Request() req) {
         return this.usersService.addTagsToUser(dto, req.user.id);
     }
-
-
-
 }
 

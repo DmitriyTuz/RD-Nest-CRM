@@ -1,4 +1,17 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Req, Request, UseGuards} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Post,
+    Put,
+    Req,
+    Request,
+    UseGuards,
+    UsePipes,
+    ValidationPipe
+} from '@nestjs/common';
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {TagsService} from "./tags.service";
 import {Tag} from "./tags.model";
@@ -11,17 +24,6 @@ import {UpdateTagDto} from "./dto/update-tag.dto";
 @Controller('tags')
 export class TagsController {
     constructor(private tagsService: TagsService) {}
-
-    // @ApiOperation({ summary: "Tag creation" })
-    // @ApiResponse({ status: 200, type: Tag })
-    // // @UseGuards(JwtAuthGuard)
-    // @UseGuards(AuthGuard('local'))
-    // // @ApiBearerAuth('JWT')
-    // @Post('/create-user-tag')
-    // createUserTag(@Body() tagDto: CreateTagDto, @Request() req) {
-    //     console.log('!!! req = ', req)
-    //     return this.tagsService.createUserTag(tagDto, req.user.id);
-    // }
 
     @Post('/create-user-tag')
     @ApiOperation({ summary: "Tag creation" })
@@ -39,28 +41,28 @@ export class TagsController {
         return this.tagsService.getAllTags();
     }
 
-    @ApiOperation({ summary: "Getting tag by id" })
-    @ApiResponse({ status: 200, type: Tag })
-    @Get('/:id')
-    getById(@Param("id") id: number) {
-        return this.tagsService.getTagById(id);
-    }
+    // @ApiOperation({ summary: "Getting tag by id" })
+    // @ApiResponse({ status: 200, type: Tag })
+    // @Get('/:id')
+    // getById(@Param("id") id: number) {
+    //     return this.tagsService.getTagById(id);
+    // }
 
-    @Put('/update-user-tag')
+    @Put('/update-user-tag/:id')
+    @UsePipes(ValidationPipe)
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('JWT')
     @ApiOperation({ summary: "Tag update" })
-    updateUserTag(@Body() updateTagDto: UpdateTagDto, @Request() req): Promise<void> {
-        return this.tagsService.updateUserTag(updateTagDto, req.user.id);
+    updateUserTag(@Param('id') id: number, @Body() updateTagDto: UpdateTagDto, @Request() req): Promise<void> {
+        return this.tagsService.updateUserTag(id, updateTagDto, req.user.id);
     }
 
-    @Delete('/delete-user-tag')
+    @Delete('/delete-user-tag/:id')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('JWT')
     @ApiOperation({ summary: "Tag remove" })
-    deleteUserTag(@Body() deleteTagDto: TagDto, @Request() req): Promise<void> {
-        return this.tagsService.deleteUserTag(deleteTagDto, req.user.id);
+    deleteUserTag(@Param('id') id: number, @Request() req): Promise<void> {
+        return this.tagsService.deleteUserTag(id, req.user.id);
     }
-
 
 }
