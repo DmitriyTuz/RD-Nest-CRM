@@ -52,10 +52,10 @@ export class TagRepository {
         await this.tagModel.bulkCreate(arrayForBulkCreate)
     }
 
-    async updateUserTag(dto, currentUserId) {
-        const { name, color, changeName, changeColor } = dto;
+    async updateUserTag(tagId, dto, currentUserId) {
+        const { changeName, changeColor } = dto;
 
-        const tag = await this.tagModel.findOne({ where: { name, color, ownerId: currentUserId } });
+        const tag = await this.tagModel.findOne({ where: { id: tagId, ownerId: currentUserId } });
 
         if (!tag) {
             throw new HttpException("Tag not found or not created by this user", HttpStatus.NOT_FOUND);
@@ -67,10 +67,9 @@ export class TagRepository {
         await tag.save();
     }
 
-    async deleteUserTag(deleteTagDto: TagDto, currentUserId) {
-        const { name, color } = deleteTagDto;
+    async deleteUserTag(tagId, currentUserId) {
 
-        const tag = await this.tagModel.findOne({ where: { name, color, ownerId: currentUserId } });
+        const tag = await this.tagModel.findOne({ where: { id: tagId, ownerId: currentUserId } });
 
         if (!tag) {
             throw new HttpException("Tag not found or not created by this user", HttpStatus.NOT_FOUND);
