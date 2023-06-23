@@ -11,10 +11,10 @@ import {Tag} from "./tags.model";
 @Table({ tableName: "user_tags", createdAt: false, updatedAt: false })
 export class UserTags extends Model<UserTags> {
     @Column({
-        type: DataType.INTEGER,
-        unique: true,
-        autoIncrement: true,
         primaryKey: true,
+        type: DataType.INTEGER,
+        autoIncrement: true,
+        allowNull: false
     })
     id: number;
 

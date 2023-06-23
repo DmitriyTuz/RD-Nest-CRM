@@ -18,8 +18,10 @@ interface TagCreationAttrs {
 @Table({ tableName: "tags" })
 export class Tag extends Model<Tag, TagCreationAttrs> {
 
+// export class Tag extends Model {
     @ApiProperty({ example: "1", description: "unique id" })
     @Column({
+        allowNull: false,
         type: DataType.INTEGER,
         unique: true,
         autoIncrement: true,
