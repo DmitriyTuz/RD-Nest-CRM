@@ -18,21 +18,21 @@ interface UserCreationAttrs {
 @Table({ tableName: "users" })
 export class User extends Model<User, UserCreationAttrs> {
 
+// export class User extends Model {
     @ApiProperty({ example: "1", description: "unique id" })
     @Column({
+        allowNull: false,
         type: DataType.INTEGER,
         unique: true,
         autoIncrement: true,
-        primaryKey: true,
-        // onDelete: 'CASCADE'
+        primaryKey: true
     })
     id: number;
 
     @ApiProperty({ example: "Alex", description: "name" })
     @Column({
         type: DataType.STRING,
-        allowNull: false,
-        // onDelete: 'CASCADE'
+        allowNull: false
     })
     name: string;
 
@@ -40,16 +40,14 @@ export class User extends Model<User, UserCreationAttrs> {
     @Column({
         type: DataType.STRING,
         unique: true,
-        allowNull: false,
-        // onDelete: 'CASCADE'
+        allowNull: false
     })
     email: string;
 
     @ApiProperty({ example: "1234567", description: "password" })
     @Column({
         type: DataType.STRING,
-        allowNull: false,
-        // onDelete: 'CASCADE'
+        allowNull: false
     })
     password: string;
 

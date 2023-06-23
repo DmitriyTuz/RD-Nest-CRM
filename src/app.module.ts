@@ -24,7 +24,7 @@ import {JwtModule} from "@nestjs/jwt";
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
             models: [User, Tag, UserTags],
-            autoLoadModels: true,
+            // autoLoadModels: true,
             // logging: false
         }),
         // SequelizeModule.forFeature([User, Tag, UserTags]),
