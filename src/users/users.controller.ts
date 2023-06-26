@@ -101,7 +101,6 @@ export class UsersController {
         @Query('tagNames') tagNames: string,
         @Query('search') searchByPartOfTagName: string,
         // @Query('search') search: string,
-
         @Request() req,
     ): Promise<User[]> {
         let parsedTagNames: string[] = [];

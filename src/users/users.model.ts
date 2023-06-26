@@ -1,13 +1,14 @@
 import {
     BelongsToMany,
     Column,
-    DataType,
+    DataType, HasMany,
     Model,
     Table,
 } from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
 import {Tag} from "../tags/tags.model";
 import {UserTags} from "../tags/user-tags.model";
+import {Post} from "../posts/posts.model";
 
 interface UserCreationAttrs {
     name: string
@@ -53,5 +54,8 @@ export class User extends Model<User, UserCreationAttrs> {
 
     @BelongsToMany(() => Tag, () => UserTags)
     tags: Tag[];
+
+    @HasMany(() => Post)
+    posts: Post[];
 }
 
