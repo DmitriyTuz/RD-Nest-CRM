@@ -11,6 +11,10 @@ import {JwtModule} from "@nestjs/jwt";
 import {FilesModule} from "./files/files.module";
 import {PostsModule} from "./posts/posts.module";
 import {Post} from "./posts/posts.model";
+import { S3Controller } from './s3/s3.controller';
+import { S3Service } from './s3/s3.service';
+import { AwsConfigModule } from './aws.config/aws.config.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
     controllers: [],
@@ -35,7 +39,9 @@ import {Post} from "./posts/posts.model";
         AuthModule,
         JwtModule,
         PostsModule,
-        FilesModule
+        FilesModule,
+        AwsConfigModule,
+        S3Module
     ],
 
 })
