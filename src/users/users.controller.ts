@@ -13,7 +13,6 @@ import {ApiBearerAuth, ApiBody, ApiExtraModels, ApiOperation, ApiQuery, ApiRespo
 import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {TagDto} from "./dto/add-tag.dto";
-import {Tag} from "../tags/tags.model";
 
 @ApiTags("Users")
 @ApiExtraModels(TagDto)
