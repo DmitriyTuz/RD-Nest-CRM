@@ -22,3 +22,8 @@ $ npm run start:dev
 $ npm run test
 ```
 
+## Docker 
+
+! for run with docker please change host "localhost" in .env
+and in file "siquelize_cli/config/config.json" on "postgres"
+

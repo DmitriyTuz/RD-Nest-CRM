@@ -9,17 +9,12 @@ import * as passport from 'passport';
 async function start() {
 
     const PORT = process.env.PORT || 5000;
-    console.log('!!!PORT = ', PORT)
     const app = await NestFactory.create(AppModule);
 
     // app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
-    console.log('!!!secret = ', process.env.PRIVATE_KEY)
-
-    // Регистрация и настройка Passport
     app.use(passport.initialize());
 
-    // Подключение стратегии JWT
     const jwtStrategy = app.get(JwtStrategy);
     passport.use(jwtStrategy);
 
