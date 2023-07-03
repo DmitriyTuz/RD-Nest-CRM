@@ -16,6 +16,8 @@ import { S3Service } from './s3/s3.service';
 import { AwsConfigModule } from './aws.config/aws.config.module';
 import { S3Module } from './s3/s3.module';
 
+// const { config } = require('../config/config.js')
+
 @Module({
     controllers: [],
     providers: [],
