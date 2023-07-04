@@ -22,8 +22,12 @@ export class TagsService {
         return await this.tagRepository.getTagByNameAndColor(name, color);
     }
 
-    async createUserTag(dto, currentUserId) {
-        return await this.tagRepository.createUserTag(dto, currentUserId);
+    async createUserTag(dto, id) {
+        return await this.tagRepository.createUserTag(dto, id);
+    }
+
+    async createTagOfOrder(dto, id) {
+        return await this.tagRepository.createTagOfOrder(dto, id);
     }
 
     async bulkCreateTags(arrayForBulkCreate: any) {
@@ -42,4 +46,7 @@ export class TagsService {
         return await this.tagRepository.deleteUserTag(tagId, currentUserId);
     }
 
+    async deleteTagOfOrder(tagId, orderId, currentUserId) {
+        return await this.tagRepository.deleteTagOfOrder(tagId, orderId, currentUserId);
+    }
 }

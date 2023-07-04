@@ -5,7 +5,7 @@ import {
     Get,
     Param,
     Post,
-    Put,
+    Put, Query,
     Req,
     Request,
     UseGuards,
@@ -18,6 +18,7 @@ import {Tag} from "./tags.model";
 import {CreateTagDto} from "./dto/create-tag.dto";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {UpdateTagDto} from "./dto/update-tag.dto";
+import {CreateTagOfOrderDto} from "./dto/create-tag-of-order.dto";
 
 @ApiTags("Tags")
 @Controller('tags')
@@ -31,6 +32,15 @@ export class TagsController {
     @ApiBearerAuth('JWT')
     createUserTag(@Body() tagDto: CreateTagDto, @Req() req) {
         return this.tagsService.createUserTag(tagDto, req.user.id);
+    }
+
+    @Post('/create-tag-of-order')
+    @ApiOperation({ summary: "Order tag creation" })
+    @ApiResponse({ status: 200, type: Tag })
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
+    createTagOfOrder(@Body() dto: CreateTagOfOrderDto, @Req() req) {
+        return this.tagsService.createTagOfOrder(dto, req.user.id);
     }
 
     @ApiOperation({ summary: "Getting all tags" })
@@ -62,6 +72,14 @@ export class TagsController {
     @ApiOperation({ summary: "Tag remove" })
     deleteUserTag(@Param('id') id: number, @Request() req): Promise<void> {
         return this.tagsService.deleteUserTag(id, req.user.id);
+    }
+
+    @Delete('/delete-tag-of-order/:id')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT')
+    @ApiOperation({ summary: "Tag remove" })
+    deleteTagOfOrder(@Param('id') id: number, @Query('orderId') orderId: string, @Request() req): Promise<void> {
+        return this.tagsService.deleteTagOfOrder(id, +orderId, req.user.id);
     }
 
 }

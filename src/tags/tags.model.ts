@@ -8,6 +8,8 @@ import {
 import {ApiProperty} from "@nestjs/swagger";
 import {User} from "../users/users.model";
 import {UserTags} from "./user-tags.model";
+import {Order} from "../orders/orders.model";
+import {OrderTags} from "./order-tags.model";
 
 interface TagCreationAttrs {
     name: string
@@ -50,6 +52,16 @@ export class Tag extends Model<Tag, TagCreationAttrs> {
     })
     ownerId: number;
 
+    @ApiProperty({ example: "1", description: "field for the id of the order" })
+    @Column({
+        type: DataType.INTEGER,
+        // allowNull: false
+    })
+    orderId: number;
+
     @BelongsToMany(() => User, () => UserTags)
     users: User[];
+
+    @BelongsToMany(() => Order, () => OrderTags)
+    orders: Order[];
 }
