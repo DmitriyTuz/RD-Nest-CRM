@@ -37,12 +37,23 @@ export class TagRepository {
         return await this.tagModel.findOne({where: {id}});
     }
 
-    async createUserTag(dto: CreateTagDto, currentUserId) {
+    async createUserTag(dto, currentUserId) {
         const { name, color } = dto;
         const tag = await this.tagModel.findOne({where: { name, color }})
 
         if (tag) {
-            throw new HttpException("Tag with the same name and color already exists", HttpStatus.NOT_FOUND);
+            throw new HttpException("This tag already exists", HttpStatus.FOUND);
+        }
+
+        return await this.tagModel.create({...dto, ownerId: currentUserId});
+    }
+
+    async createTagOfOrder(dto, currentUserId) {
+        const { name, color, orderId } = dto;
+        const tag = await this.tagModel.findOne({where: { name, color, orderId }})
+
+        if (tag) {
+            throw new HttpException("This tag already exists", HttpStatus.FOUND);
         }
 
         return await this.tagModel.create({...dto, ownerId: currentUserId});
@@ -81,4 +92,13 @@ export class TagRepository {
         await tag.destroy();
     }
 
+    async deleteTagOfOrder(tagId, orderId, currentUserId) {
+        const tag = await this.tagModel.findOne({ where: { id: tagId, orderId: orderId, ownerId: currentUserId } });
+
+        if (!tag) {
+            throw new HttpException("Tag not found or not created by this user", HttpStatus.NOT_FOUND);
+        }
+
+        await tag.destroy();
+    }
 }

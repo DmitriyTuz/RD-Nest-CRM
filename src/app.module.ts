@@ -15,11 +15,15 @@ import { S3Controller } from './s3/s3.controller';
 import { S3Service } from './s3/s3.service';
 import { AwsConfigModule } from './aws.config/aws.config.module';
 import { S3Module } from './s3/s3.module';
+import { OrdersController } from './orders/orders.controller';
+import { OrdersModule } from './orders/orders.module';
+import {OrderTags} from "./tags/order-tags.model";
+import {Order} from "./orders/orders.model";
 
 // const { config } = require('../config/config.js')
 
 @Module({
-    controllers: [],
+    controllers: [OrdersController],
     providers: [],
     imports: [
         ConfigModule.forRoot({
@@ -32,7 +36,7 @@ import { S3Module } from './s3/s3.module';
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Tag, UserTags, Post],
+            models: [User, Tag, UserTags, Post, Order, OrderTags],
             // autoLoadModels: true,
             // logging: false
         }),
@@ -43,7 +47,8 @@ import { S3Module } from './s3/s3.module';
         PostsModule,
         FilesModule,
         AwsConfigModule,
-        S3Module
+        S3Module,
+        OrdersModule
     ],
 
 })

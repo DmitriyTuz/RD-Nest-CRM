@@ -9,6 +9,7 @@ import {ApiProperty} from "@nestjs/swagger";
 import {Tag} from "../tags/tags.model";
 import {UserTags} from "../tags/user-tags.model";
 import {Post} from "../posts/posts.model";
+import {Order} from "../orders/orders.model";
 
 interface UserCreationAttrs {
     name: string
@@ -57,5 +58,8 @@ export class User extends Model<User, UserCreationAttrs> {
 
     @HasMany(() => Post)
     posts: Post[];
+
+    @HasMany(() => Order)
+    orders: Order[];
 }
 
