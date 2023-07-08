@@ -11,16 +11,14 @@ import {JwtModule} from "@nestjs/jwt";
 import {FilesModule} from "./files/files.module";
 import {PostsModule} from "./posts/posts.module";
 import {Post} from "./posts/posts.model";
-import { S3Controller } from './s3/s3.controller';
-import { S3Service } from './s3/s3.service';
 import { AwsConfigModule } from './aws.config/aws.config.module';
 import { S3Module } from './s3/s3.module';
 import { OrdersController } from './orders/orders.controller';
 import { OrdersModule } from './orders/orders.module';
 import {OrderTags} from "./tags/order-tags.model";
 import {Order} from "./orders/orders.model";
-
-// const { config } = require('../config/config.js')
+import {RedisModule} from '@liaoliaots/nestjs-redis';
+import {RedisDbModule} from "./redis-db/redis-db.module";
 
 @Module({
     controllers: [OrdersController],
@@ -40,6 +38,26 @@ import {Order} from "./orders/orders.model";
             // autoLoadModels: true,
             // logging: false
         }),
+        // RedisModule.register({
+        //     name: 'redisConnection',
+        //     url: 'redis://localhost:6379'
+        // }),
+        // RedisModule.forRoot({
+        //     config: {
+        //         host: 'localhost',
+        //         port: 6379,
+        //         password: 'authpassword'
+        //     }
+        // }),
+
+        RedisModule.forRoot({
+            config: {
+                // name: 'redisConnection',
+                host: 'localhost',
+                port: 6379,
+                password: 'authpassword'
+            }
+        }),
         UsersModule,
         TagsModule,
         AuthModule,
@@ -48,7 +66,8 @@ import {Order} from "./orders/orders.model";
         FilesModule,
         AwsConfigModule,
         S3Module,
-        OrdersModule
+        OrdersModule,
+        RedisDbModule,
     ],
 
 })
