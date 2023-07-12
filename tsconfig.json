@@ -16,6 +16,15 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "allowJs": true,
+//    "types": [
+//      "jest" // Добавьте эту строку
+//    ],
+//    "files": [
+//      "src/main.ts",
+//      "src/**/*.ts",
+//      "src/**/*.js" // Добавьте эту строку, если требуется
+//    ]
   }
 }

@@ -8,7 +8,7 @@ import {Op, Sequelize, Order, QueryTypes } from 'sequelize';
 import {UserRepository} from "./users.repository";
 import {UserTags} from "../tags/user-tags.model";
 import {User} from "./users.model";
-import sequelizeConfig from "../../config/sequelize.config";
+// import sequelizeConfig from "../../config/sequelize.config";
 
 @Injectable()
 export class UsersService {
