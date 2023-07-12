@@ -1,5 +1,5 @@
-import { TestHelper } from '../../test/common/test-helper';
-import { UsersService } from './users.service';
+import {TestHelper} from '../../test/common/test-helper';
+import {UsersService} from './users.service';
 import {UsersController} from "./users.controller";
 import {AppModule} from "../app.module";
 import {AuthService} from "../auth/auth.service";
@@ -7,9 +7,8 @@ import {CreateUserDto} from "./dto/create-user.dto";
 import {JwtService} from "@nestjs/jwt";
 import {UserTags} from "../tags/user-tags.model";
 
-import { Sequelize} from 'sequelize-typescript';
+import {Sequelize} from 'sequelize-typescript';
 import {User} from "./users.model";
-
 
 import * as request from 'supertest';
 import {HttpStatus, Put} from "@nestjs/common";

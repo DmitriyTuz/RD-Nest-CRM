@@ -1,9 +1,9 @@
 import {Module} from "@nestjs/common";
 import {SequelizeModule} from "@nestjs/sequelize";
 import {ConfigModule} from "@nestjs/config";
-import { UsersModule } from './users/users.module';
+import {UsersModule} from './users/users.module';
 import {User} from "./users/users.model";
-import { TagsModule } from './tags/tags.module';
+import {TagsModule} from './tags/tags.module';
 import {Tag} from "./tags/tags.model";
 import {UserTags} from "./tags/user-tags.model";
 import {AuthModule} from "./auth/auth.module";
@@ -11,17 +11,16 @@ import {JwtModule} from "@nestjs/jwt";
 import {FilesModule} from "./files/files.module";
 import {PostsModule} from "./posts/posts.module";
 import {Post} from "./posts/posts.model";
-import { AwsConfigModule } from './aws.config/aws.config.module';
-import { S3Module } from './s3/s3.module';
-import { OrdersController } from './orders/orders.controller';
-import { OrdersModule } from './orders/orders.module';
+import {AwsConfigModule} from './aws.config/aws.config.module';
+import {S3Module} from './s3/s3.module';
+import {OrdersModule} from './orders/orders.module';
 import {OrderTags} from "./tags/order-tags.model";
 import {Order} from "./orders/orders.model";
 import {RedisModule} from '@liaoliaots/nestjs-redis';
 import {RedisDbModule} from "./redis-db/redis-db.module";
 
 @Module({
-    controllers: [OrdersController],
+    controllers: [],
     providers: [],
     imports: [
         ConfigModule.forRoot({
@@ -36,26 +35,15 @@ import {RedisDbModule} from "./redis-db/redis-db.module";
             database: process.env.POSTGRES_DB,
             models: [User, Tag, UserTags, Post, Order, OrderTags],
             // autoLoadModels: true,
-            // logging: false
+            logging: false
         }),
-        // RedisModule.register({
-        //     name: 'redisConnection',
-        //     url: 'redis://localhost:6379'
-        // }),
-        // RedisModule.forRoot({
-        //     config: {
-        //         host: 'localhost',
-        //         port: 6379,
-        //         password: 'authpassword'
-        //     }
-        // }),
 
         RedisModule.forRoot({
             config: {
                 // name: 'redisConnection',
                 host: 'localhost',
                 port: 6379,
-                password: 'authpassword'
+                // password: 'authpassword'
             }
         }),
         UsersModule,
@@ -67,7 +55,7 @@ import {RedisDbModule} from "./redis-db/redis-db.module";
         AwsConfigModule,
         S3Module,
         OrdersModule,
-        RedisDbModule,
+        RedisDbModule
     ],
 
 })
