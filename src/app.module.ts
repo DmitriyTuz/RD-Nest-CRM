@@ -18,6 +18,8 @@ import {OrderTags} from "./tags/order-tags.model";
 import {Order} from "./orders/orders.model";
 import {RedisModule} from '@liaoliaots/nestjs-redis';
 import {RedisDbModule} from "./redis-db/redis-db.module";
+import {BullModule} from "@nestjs/bull";
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
     controllers: [],
@@ -46,6 +48,14 @@ import {RedisDbModule} from "./redis-db/redis-db.module";
                 // password: 'authpassword'
             }
         }),
+
+        BullModule.forRoot({
+            redis: {
+                host: 'localhost',
+                port: 6379
+            }
+        }),
+
         UsersModule,
         TagsModule,
         AuthModule,
@@ -55,7 +65,8 @@ import {RedisDbModule} from "./redis-db/redis-db.module";
         AwsConfigModule,
         S3Module,
         OrdersModule,
-        RedisDbModule
+        RedisDbModule,
+        DocumentsModule
     ],
 
 })
