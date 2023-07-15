@@ -2,9 +2,9 @@
 
 #npm install
 
-cd siquelize_cli
+#cd siquelize_cli
 npx sequelize-cli db:migrate
-cd ..
+#cd ..
 npm run start:dev
 
 #npx sequelize-cli db:migrate:undo:all

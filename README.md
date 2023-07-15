@@ -28,4 +28,5 @@ $ npm run test
 
 ! for run with docker please change host "localhost" in .env
 and in file "siquelize_cli/config/config.json" on "postgres"
+for db postgres and host : 'localhost' on 'redis' in AppModule
 
