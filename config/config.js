@@ -8,8 +8,7 @@ module.exports =
       "host": process.env.POSTGRES_HOST,
       "dialect": 'postgres',
       "protocol": process.env.POSTGRES_PROTOCOL,
-      "port": +process.env.POSTGRES_PORT
-
+      "port": +process.env.POSTGRES_PORT,
 
       // "dialectOptions": {
       //   "ssl": {

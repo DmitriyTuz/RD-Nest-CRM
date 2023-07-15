@@ -43,7 +43,7 @@ import { DocumentsModule } from './documents/documents.module';
         RedisModule.forRoot({
             config: {
                 // name: 'redisConnection',
-                host: 'localhost',
+                host: 'redis',
                 port: 6379,
                 // password: 'authpassword'
             }
@@ -51,7 +51,7 @@ import { DocumentsModule } from './documents/documents.module';
 
         BullModule.forRoot({
             redis: {
-                host: 'localhost',
+                host: 'redis',
                 port: 6379
             }
         }),
