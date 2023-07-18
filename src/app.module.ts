@@ -20,6 +20,9 @@ import {RedisModule} from '@liaoliaots/nestjs-redis';
 import {RedisDbModule} from "./redis-db/redis-db.module";
 import {BullModule} from "@nestjs/bull";
 import { DocumentsModule } from './documents/documents.module';
+import { FirebaseConfigModule } from './firebase.config/firebase.config.module';
+import { FirebaseStorageModule } from './firebase-storage/firebase-storage.module';
+
 
 @Module({
     controllers: [],
@@ -43,7 +46,7 @@ import { DocumentsModule } from './documents/documents.module';
         RedisModule.forRoot({
             config: {
                 // name: 'redisConnection',
-                host: 'redis',
+                host: 'localhost',
                 port: 6379,
                 // password: 'authpassword'
             }
@@ -51,7 +54,7 @@ import { DocumentsModule } from './documents/documents.module';
 
         BullModule.forRoot({
             redis: {
-                host: 'redis',
+                host: 'localhost',
                 port: 6379
             }
         }),
@@ -66,7 +69,9 @@ import { DocumentsModule } from './documents/documents.module';
         S3Module,
         OrdersModule,
         RedisDbModule,
-        DocumentsModule
+        DocumentsModule,
+        FirebaseConfigModule,
+        FirebaseStorageModule
     ],
 
 })
