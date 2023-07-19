@@ -46,16 +46,16 @@ import { FirebaseStorageModule } from './firebase-storage/firebase-storage.modul
         RedisModule.forRoot({
             config: {
                 // name: 'redisConnection',
-                host: 'localhost',
-                port: 6379,
+                host: process.env.REDIS_HOST,
+                port: +process.env.REDIS_PORT,
                 // password: 'authpassword'
             }
         }),
 
         BullModule.forRoot({
             redis: {
-                host: 'localhost',
-                port: 6379
+                host: process.env.REDIS_HOST,
+                port: +process.env.REDIS_PORT
             }
         }),
 
