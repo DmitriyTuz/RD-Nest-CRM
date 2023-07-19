@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FirebaseStorageService } from './firebase-storage.service';
 import { File } from 'multer';
 
-@Controller('storage')
+@Controller('firebase-storage')
 export class FirebaseStorageController {
     constructor(private firebaseStorageService: FirebaseStorageService) {}
 
