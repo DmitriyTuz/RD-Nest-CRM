@@ -7,9 +7,10 @@ export class AwsConfigService {
     private s3: AWS.S3;
 
     constructor(private configService: ConfigService) {
+
         const awsConfig = new AWS.Config({
-            accessKeyId: this.configService.get(process.env.AWS_ACCESS_KEY_ID),
-            secretAccessKey: this.configService.get(process.env.AWS_SECRET_ACCESS_KEY),
+            accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
+            secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
             region: this.configService.get('eu-north-1')
         });
 
