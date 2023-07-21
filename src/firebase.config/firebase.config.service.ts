@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
+import pathPrivateKeyJs from "./rd-nest-crm3-firebase-adminsdk-qidrt-0b350ef917";
 
 @Injectable()
 export class FirebaseConfigService {
@@ -15,7 +16,8 @@ export class FirebaseConfigService {
         };
 
         this.firebaseApp = admin.initializeApp({
-            credential: admin.credential.cert(firebaseConfig),
+            // credential: admin.credential.cert(firebaseConfig),
+            credential: admin.credential.cert(pathPrivateKeyJs as admin.ServiceAccount),
             storageBucket: `${firebaseConfig.project_id}.appspot.com`,
         });
     }
