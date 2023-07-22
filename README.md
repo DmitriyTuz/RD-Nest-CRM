@@ -1,31 +1,31 @@
-## Installation
+## Installation:
 
-```bash
 $ npm install
-```
 
-## Running the app
+## DB:
 
-```bash
-# development
+create postgres db (or import from dump)
+
+## Migrations:
+
+npx sequelize-cli db:migrate
+
+#### Remove all migration tables:
+
+npx sequelize-cli db:migrate:undo:all
+
+## Running the app:
+
 $ npm run start:dev
-```
 
-## Testing endpoints in Postman
+## Running the app with Docker:
 
-1) GET - http://localhost:5000/users/search-by-tags?tagIds=1,2,3
-2) 
+npm run start:docker
 
+## Testing endpoints in Swagger:
 
-## Test
+http://localhost:5000/api/docs
 
-```bash
-# unit tests
+## Unit tests (Jest):
+
 $ npm run test
-```
-
-## Docker 
-
-! for run with docker please change POSTGRES_HOST='localhost' in .development.env
-on 'postgres' for db postgres and host: 'localhost' on 'redis' in AppModule.
-
