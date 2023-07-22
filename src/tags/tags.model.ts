@@ -8,8 +8,6 @@ import {
 import {ApiProperty} from "@nestjs/swagger";
 import {User} from "../users/users.model";
 import {UserTags} from "./user-tags.model";
-// import {Order} from "../orders/orders.model";
-// import {OrderTags} from "./order-tags.model";
 
 interface TagCreationAttrs {
     name: string

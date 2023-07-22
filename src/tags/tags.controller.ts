@@ -26,7 +26,7 @@ export class TagsController {
     constructor(private tagsService: TagsService) {}
 
     @Post('/create-user-tag')
-    @ApiOperation({ summary: "Tag creation" })
+    @ApiOperation({ summary: "User tag creation" })
     @ApiResponse({ status: 200, type: Tag })
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('JWT')
@@ -34,7 +34,7 @@ export class TagsController {
         return this.tagsService.createUserTag(tagDto, req.user.id);
     }
 
-    @Post('/create-tag-of-order')
+    @Post('/create-order-tag')
     @ApiOperation({ summary: "Order tag creation" })
     @ApiResponse({ status: 200, type: Tag })
     @UseGuards(JwtAuthGuard)
@@ -74,7 +74,7 @@ export class TagsController {
         return this.tagsService.deleteUserTag(id, req.user.id);
     }
 
-    @Delete('/delete-tag-of-order/:id')
+    @Delete('/delete-order-tag/:id')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('JWT')
     @ApiOperation({ summary: "Tag remove" })

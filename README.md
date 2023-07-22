@@ -14,7 +14,7 @@ $ npm run start:dev
 ## Testing endpoints in Postman
 
 1) GET - http://localhost:5000/users/search-by-tags?tagIds=1,2,3
-2)
+2) 
 
 
 ## Test
