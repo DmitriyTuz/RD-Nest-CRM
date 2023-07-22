@@ -10,7 +10,7 @@ import {AuthModule} from "./auth/auth.module";
 import {JwtModule} from "@nestjs/jwt";
 import {FilesModule} from "./files/files.module";
 import {PostsModule} from "./posts/posts.module";
-import {Post} from "./posts/posts.model";
+import {Posts} from "./posts/posts.model";
 import {AwsConfigModule} from './aws.config/aws.config.module';
 import {S3Module} from './s3/s3.module';
 import {OrdersModule} from './orders/orders.module';
@@ -38,7 +38,7 @@ import { FirebaseStorageModule } from './firebase-storage/firebase-storage.modul
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Tag, UserTags, Post, Order, OrderTags],
+            models: [User, Tag, UserTags, Posts, Order, OrderTags],
             // autoLoadModels: true,
             logging: false
         }),

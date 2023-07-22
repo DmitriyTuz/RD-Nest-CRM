@@ -8,13 +8,13 @@ import {UserTags} from "../tags/user-tags.model";
 import {AuthModule} from "../auth/auth.module";
 import {TagsModule} from "../tags/tags.module";
 import {UserRepository} from "./users.repository";
-import {Post} from "../posts/posts.model";
+import {Posts} from "../posts/posts.model";
 
 @Module({
   controllers: [UsersController],
   providers: [UsersService, UserRepository],
   imports: [
-      SequelizeModule.forFeature([User, Tag, UserTags, Post]),
+      SequelizeModule.forFeature([User, Tag, UserTags, Posts]),
       TagsModule,
       forwardRef(() => AuthModule)
   ],

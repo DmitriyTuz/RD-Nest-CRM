@@ -76,7 +76,7 @@ export class UsersController {
     @Get('search-users-by-tagNames')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('JWT')
-    @ApiOperation({ summary: 'Search by authorized user of users by tag' })
+    @ApiOperation({ summary: 'Search by authorized user of users by tag names' })
     @ApiQuery({
         name: 'tagNames',
         type: 'string',

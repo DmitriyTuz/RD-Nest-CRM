@@ -19,7 +19,7 @@ async function start() {
     passport.use(jwtStrategy);
 
     const config = new DocumentBuilder()
-        .setTitle("test-RaDevs")
+        .setTitle("rd-nest-crm")
         .setDescription("Documentation REST API")
         .setVersion("0.0.1")
         .addTag("D_TUZ")

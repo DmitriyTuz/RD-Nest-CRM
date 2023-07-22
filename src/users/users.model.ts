@@ -8,7 +8,7 @@ import {
 import {ApiProperty} from "@nestjs/swagger";
 import {Tag} from "../tags/tags.model";
 import {UserTags} from "../tags/user-tags.model";
-import {Post} from "../posts/posts.model";
+import {Posts} from "../posts/posts.model";
 import {Order} from "../orders/orders.model";
 
 interface UserCreationAttrs {
@@ -56,8 +56,8 @@ export class User extends Model<User, UserCreationAttrs> {
     @BelongsToMany(() => Tag, () => UserTags)
     tags: Tag[];
 
-    @HasMany(() => Post)
-    posts: Post[];
+    @HasMany(() => Posts)
+    posts: Posts[];
 
     @HasMany(() => Order)
     orders: Order[];
